@@ -23,7 +23,8 @@
     </div>
 
     <div class="user-info">
-      <img id="profile-pic" src="#" alt="Avatar" style="display: none;" />
+      <img id="profile-pic" src="/public/pages/img-pag/default-avatar.png" alt="Avatar do Usuário" style="display: none;" />
+      <span id="user-name"></span>
       <button id="open-login-modal" class="login-btn">Entrar/Cadastrar</button>
       <button id="logout-btn" class="logout-btn" style="display: none;">Sair</button>
     </div>
@@ -48,7 +49,7 @@
   </main>
 
   <footer>
-    <p>&copy; 2025 Carros e Lances </p>
+    <p>&copy; 2025 Carros e Lances</p>
   </footer>
 </body>
 </html>

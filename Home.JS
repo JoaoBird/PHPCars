@@ -16,15 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const gridContainer = document.querySelector(".grid-container");
     let currentUser = JSON.parse(localStorage.getItem("currentUser"));
     let isLoginMode = true;
-  
-    // Definição global de `boxes`
-    const boxes = [
-      { name: "White and Bright", price: 5.45, id: "white-and-bright", image: "/public/pages/img-pag/box1.png" },
-      { name: "Green Wood Dragon", price: 0.20, id: "green-wood-dragon", image: "/public/pages/img-pag/box2.png" },
-      { name: "Doppler Mining", price: 1.17, id: "doppler-mining", image: "/public/pages/img-pag/box3.png" },
-      { name: "Pandora's Box", price: 26.03, id: "pandoras-box", image: "/public/pages/img-pag/box4.png" },
-      { name: "Lazy Tiger", price: 58.99, id: "lazy-tiger", image: "/public/pages/img-pag/box5.png" },
-    ];
+
   
     // Alternar entre login e cadastro
     if (toggleLink) {
@@ -107,106 +99,6 @@ document.addEventListener("DOMContentLoaded", () => {
       populateBoxes();
     }
   
-    // Popula as caixas no grid
-    function populateBoxes() {
-      const boxes = [
-        { name: "White and Bright", price: 5.45, id: "white-and-bright", image: "/public/pages/img-pag/box1.png" },
-        { name: "Green Wood Dragon", price: 0.20, id: "green-wood-dragon", image: "/public/pages/img-pag/box2.png" },
-        { name: "Doppler Mining", price: 2.17, id: "doppler-mining", image: "/public/pages/img-pag/box3.png" },
-        { name: "Pandora's Box", price: 26.03, id: "pandoras-box", image: "/public/pages/img-pag/box4.png" },
-        { name: "Lazy Tiger", price: 58.99, id: "lazy-tiger", image: "/public/pages/img-pag/box5.png" },
-      ];
-    
-      if (!gridContainer) return;
-    
-      gridContainer.innerHTML = "";
-      boxes.forEach((box) => {
-        const boxElement = document.createElement("div");
-        boxElement.className = "grid-item";
-        boxElement.innerHTML = `
-          <img src="${box.image}" alt="${box.name}">
-          <h3>${box.name}</h3>
-          <p>R$${box.price.toFixed(2)}</p>
-          <button class="enter-box-btn" 
-                  data-id="${box.id}" 
-                  data-name="${box.name}" 
-                  data-image="${box.image}">Entrar na Caixa</button>
-        `;
-        gridContainer.appendChild(boxElement);
-      });
-      
-      document.querySelectorAll(".enter-box-btn").forEach((btn) => {
-        btn.addEventListener("click", (e) => {
-          const boxId = e.target.dataset.id;
-          const boxName = e.target.dataset.name;
-          const boxImage = e.target.dataset.image;
-      
-          console.log("Box ID:", boxId);
-          console.log("Box Name:", boxName);
-          console.log("Box Image:", boxImage);
-      
-          if (!currentUser) {
-            alert("Você precisa fazer login para acessar esta caixa!");
-            return;
-          }
-      
-          // Redirecionar para a página da caixa com os parâmetros
-          window.location.href = `pages/white-and-bright.html?boxId=${boxId}&boxName=${encodeURIComponent(boxName)}&boxImage=${encodeURIComponent(boxImage)}`;
-          console.log("Box Data:", box);
-          console.log("URL Params:", window.location.search);
-          alert("alerta");
-        });
-      });
-      
-      
-    }
-    // Renderiza as caixas no grid
-    function renderGrid(filteredBoxes) {
-      gridContainer.innerHTML = ""; // Limpa a grade
-      filteredBoxes.forEach((box) => {
-        const boxElement = document.createElement("div");
-        boxElement.className = "grid-item";
-        boxElement.innerHTML = `
-          <img src="${box.image}" alt="${box.name}">
-          <h3>${box.name}</h3>
-          <p>R$${box.price.toFixed(2)}</p>
-          <button class="enter-box-btn" data-id="${box.id}">Entrar na Caixa</button>
-        `;
-        gridContainer.appendChild(boxElement);
-      });
-    }
-  
-    // Filtrar dinamicamente com base no texto do input
-    filterInput.addEventListener("input", () => {
-      const searchText = filterInput.value.toLowerCase();
-      const filteredBoxes = boxes.filter((box) =>
-        box.name.toLowerCase().includes(searchText)
-      );
-      renderGrid(filteredBoxes);
-    });
-  
-    // Inicializa a interface do usuário
-    updateUserInterface();
-  
-  
-    // Sair
-    if (logoutBtn) {
-      logoutBtn.addEventListener("click", () => {
-        if (currentUser) {
-          const users = JSON.parse(localStorage.getItem("users")) || [];
-          const userIndex = users.findIndex((u) => u.username === currentUser.username);
-          if (userIndex !== -1) {
-            users[userIndex].saldo = currentUser.saldo;
-            localStorage.setItem("users", JSON.stringify(users));
-          }
-          localStorage.removeItem("currentUser");
-          currentUser = null;
-          alert("Você saiu com sucesso.");
-          updateUserInterface();
-        }
-      });
-    }
-  
     if (openLoginModalButton) {
       openLoginModalButton.addEventListener("click", () => {
         if (loginModal) loginModal.style.display = "flex";
@@ -224,7 +116,7 @@ document.addEventListener("DOMContentLoaded", () => {
         loginModal.style.display = "none";
       }
     });
-  
+
     updateUserInterface();
   });
   

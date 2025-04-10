@@ -55,7 +55,8 @@ function usuarioLogado(){
 //Verifica o login e joga o usuário para uma página específica
 function verificarLogin(){
     if(!usuarioLogado()){
-        //Aqui a gente pode jogar ele para outro canto
+        header('Location: login.php');
+        exit;
     }
 }
 

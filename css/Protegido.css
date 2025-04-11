@@ -1,0 +1,406 @@
+/* Estilos para padronizar o formulário da área protegida */
+.card {
+    background-color: #1a2135;
+    border-radius: 10px;
+    width: 100%;
+    max-width: 600px;
+    padding: 40px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    margin: 30px auto;
+}
+
+.card h3 {
+    color: #fff;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 24px;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    color: #b7c0d8;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 12px 15px;
+    border-radius: 25px;
+    border: 1px solid #384057;
+    background-color: #2a324e;
+    color: #fff;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: #7749F8;
+    outline: none;
+}
+
+.form-group small {
+    display: block;
+    color: #b7c0d8;
+    margin-top: 5px;
+    font-size: 12px;
+}
+
+.btn {
+    width: 100%;
+    background-color: #7749F8;
+    color: #fff;
+    border: none;
+    padding: 12px;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+.btn:hover {
+    background-color: #6a3ce0;
+}
+
+.mensagem {
+    background-color: rgba(119, 73, 248, 0.2);
+    border-left: 4px solid #7749F8;
+    color: #fff;
+    padding: 10px 15px;
+    margin-bottom: 20px;
+    border-radius: 0 5px 5px 0;
+    font-size: 14px;
+}
+
+/* Estilos para a listagem de carros */
+.user-cars {
+    margin-top: 40px;
+}
+
+.user-cars h3 {
+    color: #fff;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.grid-item {
+    background-color: #1a2135;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.grid-item img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.grid-item h3 {
+    font-size: 18px;
+    margin: 15px 0 10px;
+}
+
+.grid-item p {
+    color: #b7c0d8;
+    margin: 5px 0;
+}
+
+.enter-car-btn {
+    display: block;
+    background-color: #7749F8;
+    color: #fff;
+    text-align: center;
+    padding: 10px;
+    border-radius: 25px;
+    text-decoration: none;
+    margin-top: 15px;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+}
+
+.enter-car-btn:hover {
+    background-color: #6a3ce0;
+}
+
+/* Ajustes para centralizar melhor o formulário e remover botão "Minha Área" nesta tela */
+
+/* Ocultar o botão "Minha Área" na página protegida */
+.area-protegida .minha-area-btn {
+    display: none;
+}
+
+/* Centralizar melhor o formulário */
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Ajustes no card do formulário */
+.card {
+    background-color: #1a2135;
+    border-radius: 15px;
+    width: 100%;
+    max-width: 600px;
+    padding: 40px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    margin: 30px auto;
+    position: relative;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* Garantir que o título do formulário esteja centralizado */
+.card h3 {
+    text-align: center;
+    margin-bottom: 30px;
+    position: relative;
+}
+
+/* Adicionar uma linha decorativa após o título */
+.card h3:after {
+    content: '';
+    position: absolute;
+    width: 60px;
+    height: 3px;
+    background: #7749F8;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 2px;
+}
+
+/* Ajustar o título da área protegida */
+.area-protegida-titulo {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #fff;
+    font-size: 24px;
+}
+
+/* Alternativa para esconder o botão Minha Área usando seletores mais específicos */
+header .minha-area-btn,
+nav .minha-area-btn,
+.area-protegida .minha-area-btn,
+.minha-area-btn {
+    display: none !important;
+}
+
+/* Ajuste para o cabeçalho se necessário */
+.header-container {
+    justify-content: space-between;
+}
+
+/* Ajustes para telas menores */
+@media (max-width: 768px) {
+    .card {
+        padding: 30px 20px;
+    }
+}
+
+
+    /* Melhorias de visual para o formulário */
+
+    body {
+        background: linear-gradient(135deg, #0f1726 0%, #1a2135 100%);
+    }
+    
+    .container {
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 30px 20px;
+    }
+    
+    .card {
+        background: linear-gradient(135deg, #1a2135 0%, #232b45 100%);
+        border-radius: 15px;
+        width: 100%;
+        max-width: 600px;
+        padding: 40px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        margin: 30px auto;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .card h3 {
+        color: #fff;
+        text-align: center;
+        margin-bottom: 40px;
+        font-size: 28px;
+        font-weight: 600;
+        position: relative;
+        padding-bottom: 15px;
+    }
+    
+    .card h3:after {
+        content: '';
+        position: absolute;
+        width: 60px;
+        height: 3px;
+        background: #7749F8;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        border-radius: 2px;
+    }
+    
+    .form-group {
+        margin-bottom: 25px;
+        position: relative;
+    }
+    
+    .form-group label {
+        display: block;
+        color: #b7c0d8;
+        margin-bottom: 10px;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+    
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 14px 18px;
+        border-radius: 12px;
+        border: 1px solid #384057;
+        background-color: rgba(42, 50, 78, 0.7);
+        color: #fff;
+        font-size: 15px;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) inset;
+    }
+    
+    .form-group input:focus,
+    .form-group select:focus {
+        border-color: #7749F8;
+        box-shadow: 0 0 0 2px rgba(119, 73, 248, 0.2), 0 2px 5px rgba(0, 0, 0, 0.2) inset;
+        outline: none;
+        transform: translateY(-2px);
+    }
+    
+    .form-group input::placeholder {
+        color: rgba(183, 192, 216, 0.5);
+    }
+    
+    .form-group small {
+        display: block;
+        color: #b7c0d8;
+        margin-top: 8px;
+        font-size: 12px;
+        font-style: italic;
+    }
+    
+    /* Estilização do botão */
+    .btn {
+        width: 100%;
+        background: linear-gradient(135deg, #7749F8 0%, #6a3ce0 100%);
+        color: #fff;
+        border: none;
+        padding: 16px;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 20px;
+        box-shadow: 0 5px 15px rgba(119, 73, 248, 0.4);
+        letter-spacing: 0.5px;
+    }
+    
+    .btn:hover {
+        background: linear-gradient(135deg, #6a3ce0 0%, #5c33c8 100%);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(119, 73, 248, 0.5);
+    }
+    
+    .btn:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 8px rgba(119, 73, 248, 0.4);
+    }
+    
+    /* Preview de imagem */
+    .image-preview {
+        display: none;
+        width: 100%;
+        max-height: 150px;
+        border-radius: 8px;
+        overflow: hidden;
+        margin-top: 10px;
+        border: 1px solid #384057;
+    }
+    
+    .image-preview img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    /* Indicador de progresso */
+    .progress-container {
+        margin-bottom: 30px;
+    }
+    
+    .progress-steps {
+        display: flex;
+        justify-content: space-between;
+    }
+    
+    .progress-step {
+        flex: 1;
+        text-align: center;
+        font-size: 12px;
+        color: #b7c0d8;
+        position: relative;
+    }
+    
+    .progress-step.active {
+        color: #7749F8;
+        font-weight: bold;
+    }
+    
+    .progress-step:before {
+        content: '';
+        height: 3px;
+        width: 100%;
+        background-color: #384057;
+        position: absolute;
+        left: 0;
+        top: -15px;
+    }
+    
+    .progress-step.active:before {
+        background-color: #7749F8;
+    }
+    
+    /* Responsividade para celulares */
+    @media (max-width: 480px) {
+        .card {
+            padding: 25px 15px;
+        }
+        
+        .form-group input,
+        .form-group select {
+            padding: 12px 15px;
+        }
+    }

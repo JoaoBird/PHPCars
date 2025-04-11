@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 include_once 'header.php';
 ?>
-
+<link rel="stylesheet" href="./css/Protegido.css">
 <div class="container">
     <h2>Área Protegida - Bem-vindo, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h2>
     
@@ -126,3 +126,4 @@ include_once 'header.php';
 </div>
 
 <?php include_once 'footer.php'; ?>
+

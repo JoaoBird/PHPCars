@@ -33,26 +33,27 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 include_once 'header.php';
 ?>
-
-<div class="container">
-    <h2>Login</h2>
-    
-    <?php if ($erro): ?>
-        <div class="erro"><?php echo $erro; ?></div>
-    <?php endif; ?>
-    
-    <form method="post" action="login.php">
-        <div class="form-group">
-            <label for="username">Usuário:</label>
-            <input type="text" id="username" name="username" required>
-        </div>
+<link rel="stylesheet" href="./css/Login.css">
+<div class="login-container">
+    <div class="login-box">
+        <h2>Login</h2>
         
-        <div class="form-group">
-            <label for="password">Senha:</label>
-            <input type="password" id="password" name="password" required>
-        </div>
+        <?php if ($erro): ?>
+            <div class="login-error"><?php echo $erro; ?></div>
+        <?php endif; ?>
         
-        <button type="submit" class="btn">Entrar</button>
+        <form method="post" action="login.php" class="login-form">
+            <div class="form-group">
+                <label for="username">Usuário:</label>
+                <input type="text" id="username" name="username" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Senha:</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            
+            <button type="submit" class="login-btn">Entrar</button>
     </form>
 </div>
 

@@ -1,9 +1,15 @@
-<?php
+<?php 
 // Iniciar sessão se ainda não foi iniciada
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
+// Detectar a página atual
+$pagina_atual = basename($_SERVER['PHP_SELF']);
+$e_pagina_login = ($pagina_atual == 'login.php');
+$e_pagina_protegido = ($pagina_atual == 'protegido.php');
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
@@ -22,29 +28,33 @@ if (session_status() === PHP_SESSION_NONE) {
       </a>
       <h1>Carros e Lances</h1>
     </div>
-
+    
+    <?php if (!$e_pagina_login): ?>
     <div>
       <div id="filter-area">
         <form action="index.php" method="get">
-          <input type="text" name="filtro_texto" id="filter-input" placeholder="Pesquisar carro..."
-                 value="<?php echo isset($_GET['filtro_texto']) ? htmlspecialchars($_GET['filtro_texto']) : ''; ?>">
+          <input type="text" name="busca_texto" id="filter-input" placeholder="Pesquisar carro..."
+                 value="<?php echo isset($_GET['busca_texto']) ? htmlspecialchars($_GET['busca_texto']) : ''; ?>">
           <button type="submit">Buscar</button>
         </form>
       </div>
     </div>
-
+    
     <div class="user-info">
       <?php if (isset($_SESSION['usuario_logado']) && $_SESSION['usuario_logado'] === true): ?>
         <img id="profile-pic" src="img/avatar-user.png" alt="Avatar do Usuário" />
         <span id="user-name"><?php echo htmlspecialchars($_SESSION['username']); ?></span>
         <span id="user-saldo">Saldo: R$<?php echo number_format($_SESSION['saldo'], 2, ',', '.'); ?></span>
+        <?php if(!$e_pagina_protegido): ?>
         <a href="protegido.php" class="btn">Minha Área</a>
+        <?php endif; ?>
         <a href="logout.php" class="logout-btn">Sair</a>
       <?php else: ?>
         <span id="user-name">Visitante</span>
         <a href="login.php" class="login-btn">Entrar</a>
       <?php endif; ?>
     </div>
+    <?php endif; ?>
   </header>
   
   <main>

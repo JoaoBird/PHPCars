@@ -112,14 +112,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Modo cadastro
             if (adicionarCarro($carro_dados)) {
                 $mensagem = 'Carro cadastrado com sucesso!';
-                // Redirecionar para evitar reenvio do formulário
-                header('Location: protegido.php?mensagem=' . urlencode($mensagem));
+                // Obter o ID do carro recém-cadastrado
+                $todos_carros = carregarCarros();
+                $ultimo_carro = end($todos_carros);
+                $novo_id = $ultimo_carro['id'];
+                
+                // Redirecionar para a página de detalhes com flag de recém-cadastrado
+                header('Location: detalhes.php?id=' . $novo_id . '&recemCadastrado=true');
                 exit;
             } else {
                 $mensagem = 'Erro ao cadastrar carro.';
             }
         }
     }
+
+    $todos_carros = carregarCarros();
+
+    // Filtrar apenas os carros do usuário atual
+    $carros_usuario = [];
+    foreach ($todos_carros as $carro) {
+    if (isset($carro['usuario_id']) && $carro['usuario_id'] == $_SESSION['user_id']) {
+        $carros_usuario[] = $carro;
+    }
+}
+
+
 }
 
 include_once 'header.php';
@@ -206,29 +223,47 @@ include_once 'header.php';
     </div>
     
     <!-- Listar carros adicionados pelo usuário -->
-    <div class="user-cars">
-        <h3>Seus Carros Cadastrados</h3>
-        
-        <?php if (isset($_SESSION['carros_adicionados']) && !empty($_SESSION['carros_adicionados'])): ?>
-            <div class="grid-container">
-                <?php foreach ($_SESSION['carros_adicionados'] as $carro): ?>
-                    <div class="grid-item">
-                        <img src="<?php echo htmlspecialchars($carro['imagem']); ?>" alt="<?php echo htmlspecialchars($carro['titulo']); ?>">
-                        <h4><?php echo htmlspecialchars($carro['titulo']); ?></h4>
-                        <p>Ano: <?php echo htmlspecialchars($carro['ano']); ?></p>
-                        <p>R$ <?php echo number_format($carro['preco'], 2, ',', '.'); ?></p>
-                        <div class="car-actions">
-                            <a href="detalhes.php?id=<?php echo $carro['id']; ?>" class="action-btn view-btn">Visualizar</a>
-                            <a href="protegido.php?editar=<?php echo $carro['id']; ?>" class="action-btn edit-btn">Editar</a>
-                            <a href="javascript:void(0)" onclick="confirmarExclusao(<?php echo $carro['id']; ?>, '<?php echo addslashes($carro['titulo']); ?>')" class="action-btn delete-btn">Excluir</a>
-                        </div>
+<!-- Listar carros adicionados pelo usuário -->
+<div class="user-cars">
+    <h3>Seus Carros Cadastrados</h3>
+    
+    <?php 
+    // Carregar todos os carros do arquivo
+    $todos_carros = carregarCarros();
+    
+    // Filtrar apenas os carros do usuário atual (se estiver usando ID de usuário)
+    $carros_usuario = [];
+    if (isset($_SESSION['user_id'])) {
+        foreach ($todos_carros as $carro) {
+            if (isset($carro['usuario_id']) && $carro['usuario_id'] == $_SESSION['user_id']) {
+                $carros_usuario[] = $carro;
+            }
+        }
+    } else {
+        // Usar carros da sessão para compatibilidade
+        $carros_usuario = isset($_SESSION['carros_adicionados']) ? $_SESSION['carros_adicionados'] : [];
+    }
+    
+    if (!empty($carros_usuario)): 
+    ?>
+        <div class="grid-container">
+            <?php foreach ($carros_usuario as $carro): ?>
+                <div class="grid-item">
+                    <img src="<?php echo htmlspecialchars($carro['imagem']); ?>" alt="<?php echo htmlspecialchars($carro['titulo']); ?>">
+                    <h4><?php echo htmlspecialchars($carro['titulo']); ?></h4>
+                    <p>Ano: <?php echo htmlspecialchars($carro['ano']); ?></p>
+                    <p>R$ <?php echo number_format($carro['preco'], 2, ',', '.'); ?></p>
+                    <div class="car-actions">
+                        <a href="detalhes.php?id=<?php echo $carro['id']; ?>" class="action-btn view-btn">Visualizar</a>
+                        <a href="protegido.php?editar=<?php echo $carro['id']; ?>" class="action-btn edit-btn">Editar</a>
+                        <a href="javascript:void(0)" onclick="confirmarExclusao(<?php echo $carro['id']; ?>, '<?php echo addslashes($carro['titulo']); ?>')" class="action-btn delete-btn">Excluir</a>
                     </div>
-                <?php endforeach; ?>
-            </div>
-        <?php else: ?>
-            <p class="no-cars-message">Você ainda não cadastrou nenhum carro.</p>
-        <?php endif; ?>
-    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    <?php else: ?>
+        <p class="no-cars-message">Você ainda não cadastrou nenhum carro.</p>
+    <?php endif; ?>
 </div>
 
 <script>

@@ -23,6 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['usuario_logado'] = true;
         $_SESSION['username'] = $username;
         $_SESSION['saldo'] = $usuario['saldo'];
+        $_SESSION['user_id'] = md5($username); 
+        
         
         header('Location: index.php');
         exit;

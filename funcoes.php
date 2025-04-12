@@ -1,50 +1,6 @@
-<!-- Arquivo com as funções do sistema -->
-<?php 
-
-//Função para filtrar carros
-function filtrarCarros($carros, $filtrar = []){   //Entre as chaves você coloca a TAG de filtro
-    
-    //Se não tiver nenhum opção de filtro, retorna o array de carros
-    if(empty($filtrar)){
-        return $carros;
-    }
-
-    //Array com o resultado da filtragem
-    $resultado = [];
-
-    //Inclui os carros no array no array de resultado
-    foreach ($carros as $carro) {
-        $incluir = true;
-
-        foreach ($filtrar as $chave => $valor){
-            //Se o filtro tiver o valor, mas o carro não for o certo, não adiciona
-            if(!empty($valor) && isset($carro[$chave]) && $carro[$chave] != $valor){
-                $incluir = false;
-                break;
-            }
-        }
-
-        //Adiciona o carro atual ao array de resultado
-        if($incluir){
-            $resultado[] = $carro;
-        }
-
-    }
-    
-    return $resultado;
-};
-
-//Função para busca direta por ID
-function buscarCarroPorId($carros, $id){
-    foreach ($carros as $carro) {
-        if($carro['id'] == $id){
-            return $carro;
-        }
-    }
-
-    return null;
-
-};
+<?php
+// Caminho para o arquivo JSON que armazenará os carros
+define('ARQUIVO_CARROS', 'dados/carros.json');
 
 //Verifica se o usuário está logado (necessita do session_start())
 function usuarioLogado(){
@@ -59,73 +15,207 @@ function verificarLogin(){
     }
 }
 
+// Função para carregar carros do arquivo
+function carregarCarros() {
+    if (!file_exists(ARQUIVO_CARROS)) {
+        // Garantir que o diretório existe
+        if (!file_exists('dados')) {
+            if (!mkdir('dados', 0755, true)) {
+                // Se falhar em criar o diretório, registre um erro
+                error_log('Falha ao criar diretório de dados');
+            }
+        }
+        file_put_contents(ARQUIVO_CARROS, json_encode([]));
+        return [];
+    }
+    
+    $conteudo = file_get_contents(ARQUIVO_CARROS);
+    if (empty($conteudo)) {
+        return [];
+    }
+    
+    return json_decode($conteudo, true);
+}
+
+// Função para salvar carros no arquivo
+function salvarCarros($carros) {
+    // Garantir que o diretório existe
+    if (!file_exists('dados')) {
+        mkdir('dados', 0755, true);
+    }
+    return file_put_contents(ARQUIVO_CARROS, json_encode($carros));
+}
+
+//Função para filtrar carros
+function filtrarCarros($carros, $filtrar = []){   
+    if(empty($filtrar)){
+        return $carros;
+    }
+
+    $resultado = [];
+
+    foreach ($carros as $carro) {
+        $incluir = true;
+
+        foreach ($filtrar as $chave => $valor){
+            if(!empty($valor) && isset($carro[$chave]) && $carro[$chave] != $valor){
+                $incluir = false;
+                break;
+            }
+        }
+
+        if($incluir){
+            $resultado[] = $carro;
+        }
+    }
+    
+    return $resultado;
+}
+
+//Função para busca direta por ID
+function buscarCarroPorId($carros, $id){
+    foreach ($carros as $carro) {
+        if($carro['id'] == $id){
+            return $carro;
+        }
+    }
+
+    return null;
+}
+
+// Verificar se o usuário logado é proprietário do carro
+function usuarioEProprietario($id_carro) {
+    if (!usuarioLogado() || !isset($_SESSION['user_id'])) {
+        return false;
+    }
+    
+    $carro = buscarCarro($id_carro);
+    if ($carro && isset($carro['usuario_id']) && $carro['usuario_id'] == $_SESSION['user_id']) {
+        return true;
+    }
+    
+    return false;
+}
+
+// Verifica se o usuário pode dar um lance no carro
+function podeDarLance($id_carro) {
+    // Usuário não pode dar lance se não estiver logado
+    if (!usuarioLogado()) {
+        return false;
+    }
+    
+    // Usuário não pode dar lance no próprio carro
+    return !usuarioEProprietario($id_carro);
+}
+
 //Adiciona um novo carro
 function adicionarCarro($carro){
-    //Verifica se já existe um array de carros na sessão
+    // Se ainda estiver usando a variável de sessão para compatibilidade
     if(!isset($_SESSION['carros_adicionados']) || !is_array($_SESSION['carros_adicionados'])){
-        //Se não for um array, cria um vazio
         $_SESSION['carros_adicionados'] = [];
     }
 
-    //Chama o array de carros
-    global $carros;
-    //Var para o id
-    $maior_id = 0;
-
-    //Encontrando o maior id no array de carros
-    foreach ($carros as $c){
+    // Define o ID do usuário proprietário
+    if (isset($_SESSION['user_id'])) {
+        $carro['usuario_id'] = $_SESSION['user_id'];
+    } else {
+        // Identificação temporária para compatibilidade
+        $carro['usuario_id'] = session_id();
+    }
+    
+    // Carrega carros do arquivo
+    $carros_arquivo = carregarCarros();
+    
+    // Encontrar o maior ID entre todos os carros
+    // Começamos com 1000 para evitar conflitos com carros predefinidos
+    $maior_id = 1000;
+    
+    // No arquivo
+    foreach ($carros_arquivo as $c){
         if(isset($c['id']) && $c['id'] > $maior_id){
             $maior_id = $c['id'];
-        };
+        }
     }
-
-    //Checa o maior id da lista de carros adicionados à sessão, previamente.
+    
+    // Na sessão (para compatibilidade)
     foreach ($_SESSION['carros_adicionados'] as $c){
         if(isset($c['id']) && $c['id'] > $maior_id){
             $maior_id = $c['id'];
         }
     }
-
-    //Adiciona o id ao carro
+    
+    // Adiciona o id ao carro
     $carro['id'] = $maior_id + 1;
-
-    //Adiciona o carro, com o id correto ao array da sessão
+    
+    // Adiciona à sessão para compatibilidade
     $_SESSION['carros_adicionados'][] = $carro;
-
-    //Confirmação que o carro foi adicionado
-    return true;
-
+    
+    // Adiciona ao arquivo
+    $carros_arquivo[] = $carro;
+    
+    // Salvar no arquivo
+    $salvou = salvarCarros($carros_arquivo);
+    
+    // Retorna se salvou com sucesso
+    return $salvou !== false;
 }
-
-
 // Função para editar um carro existente
 function editarCarro($carro) {
-    if (!isset($_SESSION['carros_adicionados']) || empty($_SESSION['carros_adicionados'])) {
-        return false;
+    // Carrega carros do arquivo
+    $carros = carregarCarros();
+    $editado = false;
+    
+    // Editar na sessão para compatibilidade
+    if (isset($_SESSION['carros_adicionados']) && !empty($_SESSION['carros_adicionados'])) {
+        foreach ($_SESSION['carros_adicionados'] as $key => $car) {
+            if ($car['id'] == $carro['id']) {
+                $_SESSION['carros_adicionados'][$key] = $carro;
+                break;
+            }
+        }
     }
     
-    $editado = false;
-    foreach ($_SESSION['carros_adicionados'] as $key => $car) {
+    // Editar no arquivo
+    foreach ($carros as $key => $car) {
         if ($car['id'] == $carro['id']) {
-            $_SESSION['carros_adicionados'][$key] = $carro;
+            // Preservar o usuário_id original
+            if (isset($car['usuario_id'])) {
+                $carro['usuario_id'] = $car['usuario_id'];
+            }
+            $carros[$key] = $carro;
             $editado = true;
             break;
         }
     }
     
-    return $editado;
+    if ($editado) {
+        return salvarCarros($carros);
+    }
+    
+    return false;
 }
 
 // Função para excluir um carro
 function excluirCarro($id) {
-    if (!isset($_SESSION['carros_adicionados']) || empty($_SESSION['carros_adicionados'])) {
-        return false;
+    // Carrega carros do arquivo
+    $carros = carregarCarros();
+    $excluido = false;
+    
+    // Excluir da sessão para compatibilidade
+    if (isset($_SESSION['carros_adicionados']) && !empty($_SESSION['carros_adicionados'])) {
+        foreach ($_SESSION['carros_adicionados'] as $key => $carro) {
+            if ($carro['id'] == $id) {
+                unset($_SESSION['carros_adicionados'][$key]);
+                $_SESSION['carros_adicionados'] = array_values($_SESSION['carros_adicionados']);
+                break;
+            }
+        }
     }
     
-    $excluido = false;
-    foreach ($_SESSION['carros_adicionados'] as $key => $carro) {
+    // Excluir do arquivo
+    foreach ($carros as $key => $carro) {
         if ($carro['id'] == $id) {
-            // Excluir arquivo de imagem se não for a imagem padrão e o arquivo existir
+            // Excluir arquivo de imagem se não for a imagem padrão
             if (!empty($carro['imagem']) && 
                 $carro['imagem'] !== 'img/carros/default.jpg' && 
                 strpos($carro['imagem'], 'img/carros/') === 0 && 
@@ -134,20 +224,31 @@ function excluirCarro($id) {
             }
             
             // Remover o carro do array
-            unset($_SESSION['carros_adicionados'][$key]);
-            // Reorganizar os índices
-            $_SESSION['carros_adicionados'] = array_values($_SESSION['carros_adicionados']);
+            unset($carros[$key]);
+            $carros = array_values($carros);
             $excluido = true;
             break;
         }
     }
     
-    return $excluido;
+    if ($excluido) {
+        return salvarCarros($carros);
+    }
+    
+    return false;
 }
 
-// Função para buscar um carro específico (útil para detalhes)
+// Função para buscar carro específico (útil para detalhes)
 function buscarCarro($id) {
-    // Verificar se o ID está na sessão
+    // Verificar nos carros do arquivo
+    $carros = carregarCarros();
+    foreach ($carros as $carro) {
+        if ($carro['id'] == $id) {
+            return $carro;
+        }
+    }
+    
+    // Verificar na sessão para compatibilidade
     if (isset($_SESSION['carros_adicionados']) && !empty($_SESSION['carros_adicionados'])) {
         foreach ($_SESSION['carros_adicionados'] as $carro) {
             if ($carro['id'] == $id) {
@@ -156,18 +257,20 @@ function buscarCarro($id) {
         }
     }
     
-    // Verificar nos carros pré-definidos
+    // Verificar nos carros pré-definidos globais
     global $carros;
-    foreach ($carros as $carro) {
-        if ($carro['id'] == $id) {
-            return $carro;
+    if (isset($carros) && is_array($carros)) {
+        foreach ($carros as $carro) {
+            if ($carro['id'] == $id) {
+                return $carro;
+            }
         }
     }
     
     return null;
 }
 
-// Função para criar pastas de upload se não existirem
+// Verificar pastas de upload
 function verificarPastasUpload() {
     $upload_dir = 'img/carros/';
     
@@ -176,7 +279,10 @@ function verificarPastasUpload() {
     }
 }
 
-// Verificar pastas de upload ao carregar este arquivo
+// Verificar pastas ao carregar este arquivo
 verificarPastasUpload();
+
+
+
 
 ?>

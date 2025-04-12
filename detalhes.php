@@ -3,6 +3,21 @@ session_start();
 include_once 'dados.php';
 include_once 'funcoes.php';
 
+// Definir funções necessárias caso não existam no arquivo funcoes.php
+if (!function_exists('usuarioLogado')) {
+    function usuarioLogado() {
+        return isset($_SESSION['usuario_logado']) && $_SESSION['usuario_logado'] === true;
+    }
+}
+
+if (!function_exists('podeDarLance')) {
+    function podeDarLance($id) {
+        // Implementar lógica para verificar se usuário pode dar lance
+        // Por exemplo, verificar se o carro não pertence ao usuário logado
+        return true; // Substitua pela sua lógica
+    }
+}
+
 // Obter ID do carro
 $id = isset($_GET['id']) ? $_GET['id'] : '';
 
@@ -20,7 +35,11 @@ if (!$carro) {
     exit;
 }
 
+// Incluir o header antes de qualquer saída HTML
 include_once 'header.php';
+
+// Verificar se o usuário pode dar lance - corrigido para usar $id em vez de $id_carro
+$pode_dar_lance = podeDarLance($id);
 ?>
 
 <div class="car-details">
@@ -63,17 +82,21 @@ include_once 'header.php';
         </div>
     </div>
     
-    <?php if (isset($_SESSION['usuario_logado']) && $_SESSION['usuario_logado'] === true): ?>
-        <!-- Interface de lances (simulação) -->
-        <div class="bid-section">
-            <h3>Fazer Lance</h3>
-            <form action="#" method="post">
-                <input type="hidden" name="carro_id" value="<?php echo $id; ?>">
-                <input type="number" name="valor" class="bid-input" 
-                       placeholder="Digite seu lance (R$)" min="<?php echo $carro['preco']; ?>" step="100">
-                <button type="submit" class="bid-button">Fazer Lance</button>
-            </form>
-        </div>
+    <?php if (usuarioLogado()): ?>
+        <?php if ($pode_dar_lance): ?>
+            <!-- Interface de lances (simulação) -->
+            <div class="bid-section">
+                <h3>Fazer Lance</h3>
+                <form action="#" method="post">
+                    <input type="hidden" name="carro_id" value="<?php echo $id; ?>">
+                    <input type="number" name="valor" class="bid-input" 
+                           placeholder="Digite seu lance (R$)" min="<?php echo $carro['preco']; ?>" step="100">
+                    <button type="submit" class="bid-button">Fazer Lance</button>
+                </form>
+            </div>
+        <?php else: ?>
+            <div class="alert alert-warning">Você não pode dar lance em seu próprio carro!</div>
+        <?php endif; ?>
         
         <!-- Simulação de lances anteriores -->
         <div class="current-bids">

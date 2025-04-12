@@ -1,4 +1,4 @@
-<!-- Arquivo com os arrays de dados do sistema -->
+ <!-- Arquivo com os arrays de dados do sistema -->
 
 <?php 
 

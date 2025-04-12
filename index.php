@@ -69,28 +69,37 @@ echo exibirMensagensFiltro();
             </form>
         </div>
         
-        <!-- Grid de carros -->
-        <div class="grid-container">
-            <?php if (empty($todos_carros)): ?>
-                <div class="no-results">
-                    <h3>Nenhum carro encontrado</h3>
-                    <p>Tente outros filtros ou <a href="?limpar_filtros=1">limpar todos os filtros</a></p>
-                </div>
-            <?php else: ?>
+                    <?php
+            // Carregar carros do arquivo
+            $carros_persistentes = carregarCarros();
+
+            // Combinar com carros pré-definidos (se existirem)
+            $todos_carros = isset($carros) && is_array($carros) ? array_merge($carros, $carros_persistentes) : $carros_persistentes;
+
+            // Aplicar filtros se houver
+            if (isset($_GET['filtro']) && is_array($_GET['filtro'])) {
+                $todos_carros = filtrarCarros($todos_carros, $_GET['filtro']);
+            }
+
+            // Exibir todos os carros
+            if (!empty($todos_carros)): 
+            ?>
+            <div class="grid-container">
                 <?php foreach ($todos_carros as $carro): ?>
                     <div class="grid-item">
-                        <img src="<?php echo htmlspecialchars($carro['imagem']); ?>" 
-                             alt="<?php echo htmlspecialchars($carro['titulo']); ?>">
-                        <h3><?php echo htmlspecialchars($carro['titulo']); ?></h3>
-                        <p class="car-year">Ano: <?php echo htmlspecialchars($carro['ano']); ?></p>
-                        <p class="car-price">R$ <?php echo number_format($carro['preco'], 2, ',', '.'); ?></p>
-                        <a href="detalhes.php?id=<?php echo $carro['id']; ?>" class="enter-car-btn">Ver Detalhes</a>
+                        <img src="<?php echo htmlspecialchars($carro['imagem']); ?>" alt="<?php echo htmlspecialchars($carro['titulo']); ?>">
+                        <h4><?php echo htmlspecialchars($carro['titulo']); ?></h4>
+                        <p>Ano: <?php echo htmlspecialchars($carro['ano']); ?></p>
+                        <p>R$ <?php echo number_format($carro['preco'], 2, ',', '.'); ?></p>
+                        <div class="car-actions">
+                            <a href="detalhes.php?id=<?php echo $carro['id']; ?>" class="action-btn view-btn">Detalhes</a>
+                        </div>
                     </div>
                 <?php endforeach; ?>
+            </div>
+            <?php else: ?>
+                <p class="no-cars-message">Não há carros disponíveis no momento.</p>
             <?php endif; ?>
-        </div>
-    </div>
-</div>
 
 <style>
 /* Estilos para o layout de duas colunas */

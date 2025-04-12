@@ -4,7 +4,7 @@ if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-// Função para filtrar os carros - renomeada para evitar conflito
+// Função para filtrar os carros
 function aplicarFiltrosAvancados($carros, $busca_texto = '', $categoria = '', $ano_min = '', $ano_max = '', $preco_min = '', $preco_max = '') {
     $carros_filtrados = $carros;
     
@@ -24,27 +24,35 @@ function aplicarFiltrosAvancados($carros, $busca_texto = '', $categoria = '', $a
         });
     }
     
-    // Filtrar por ano
+    // Filtrar por ano - com conversão para inteiro
     if (!empty($ano_min)) {
-        $carros_filtrados = array_filter($carros_filtrados, function($carro) use ($ano_min) {
-            return $carro['ano'] >= $ano_min;
-        });
-    }
-    if (!empty($ano_max)) {
-        $carros_filtrados = array_filter($carros_filtrados, function($carro) use ($ano_max) {
-            return $carro['ano'] <= $ano_max;
+        $ano_min_int = (int)$ano_min;
+        $carros_filtrados = array_filter($carros_filtrados, function($carro) use ($ano_min_int) {
+            // Garantir que estamos comparando números com números
+            return isset($carro['ano']) && (int)$carro['ano'] >= $ano_min_int;
         });
     }
     
-    // Filtrar por preço
-    if (!empty($preco_min)) {
-        $carros_filtrados = array_filter($carros_filtrados, function($carro) use ($preco_min) {
-            return $carro['preco'] >= $preco_min;
+    if (!empty($ano_max)) {
+        $ano_max_int = (int)$ano_max;
+        $carros_filtrados = array_filter($carros_filtrados, function($carro) use ($ano_max_int) {
+            // Garantir que estamos comparando números com números
+            return isset($carro['ano']) && (int)$carro['ano'] <= $ano_max_int;
         });
     }
+    
+    // Filtrar por preço - com conversão para float
+    if (!empty($preco_min)) {
+        $preco_min_float = (float)$preco_min;
+        $carros_filtrados = array_filter($carros_filtrados, function($carro) use ($preco_min_float) {
+            return isset($carro['preco']) && (float)$carro['preco'] >= $preco_min_float;
+        });
+    }
+    
     if (!empty($preco_max)) {
-        $carros_filtrados = array_filter($carros_filtrados, function($carro) use ($preco_max) {
-            return $carro['preco'] <= $preco_max;
+        $preco_max_float = (float)$preco_max;
+        $carros_filtrados = array_filter($carros_filtrados, function($carro) use ($preco_max_float) {
+            return isset($carro['preco']) && (float)$carro['preco'] <= $preco_max_float;
         });
     }
     
@@ -75,8 +83,16 @@ function exibirFormularioFiltros($categorias, $filtro_texto = '', $filtro_catego
     <div class="sidebar-filters">
         <h2>Filtros</h2>
         
-            
         <form action="" method="get">
+            <!-- Busca por texto -->
+            <div class="filter-group">
+                <label for="busca_texto">Busca por Texto:</label>
+                <input type="text" id="busca_texto" name="busca_texto" 
+                       placeholder="Buscar..." 
+                       value="<?php echo htmlspecialchars($filtro_texto); ?>" 
+                       class="filter-input">
+            </div>
+            
             <!-- Categoria -->
             <div class="filter-group">
                 <label for="categoria">Categoria:</label>
@@ -91,15 +107,17 @@ function exibirFormularioFiltros($categorias, $filtro_texto = '', $filtro_catego
                 </select>
             </div>
             
-            <!-- Faixa de ano -->
+            <!-- Faixa de ano - com valores numéricos explícitos -->
             <div class="filter-group">
                 <label>Faixa de Ano:</label>
                 <div class="filter-range">
                     <input type="number" id="ano_min" name="ano_min" placeholder="Ano mín" 
-                           value="<?php echo htmlspecialchars($filtro_ano_min); ?>" class="filter-input small">
+                           value="<?php echo htmlspecialchars($filtro_ano_min); ?>" 
+                           min="1900" max="2099" class="filter-input small">
                     <span class="range-separator">até</span>
                     <input type="number" id="ano_max" name="ano_max" placeholder="Ano máx" 
-                           value="<?php echo htmlspecialchars($filtro_ano_max); ?>" class="filter-input small">
+                           value="<?php echo htmlspecialchars($filtro_ano_max); ?>" 
+                           min="1900" max="2099" class="filter-input small">
                 </div>
             </div>
             

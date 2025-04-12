@@ -73,13 +73,12 @@ function filtrarCarros($carros, $filtrar = []){
 }
 
 //Função para busca direta por ID
-function buscarCarroPorId($carros, $id){
+function buscarCarroPorId($carros, $id) {
     foreach ($carros as $carro) {
-        if($carro['id'] == $id){
+        if (isset($carro['id']) && $carro['id'] == $id) {
             return $carro;
         }
     }
-
     return null;
 }
 
@@ -110,11 +109,6 @@ function podeDarLance($id_carro) {
 
 //Adiciona um novo carro
 function adicionarCarro($carro){
-    // Se ainda estiver usando a variável de sessão para compatibilidade
-    if(!isset($_SESSION['carros_adicionados']) || !is_array($_SESSION['carros_adicionados'])){
-        $_SESSION['carros_adicionados'] = [];
-    }
-
     // Define o ID do usuário proprietário
     if (isset($_SESSION['user_id'])) {
         $carro['usuario_id'] = $_SESSION['user_id'];
@@ -137,18 +131,8 @@ function adicionarCarro($carro){
         }
     }
     
-    // Na sessão (para compatibilidade)
-    foreach ($_SESSION['carros_adicionados'] as $c){
-        if(isset($c['id']) && $c['id'] > $maior_id){
-            $maior_id = $c['id'];
-        }
-    }
-    
     // Adiciona o id ao carro
     $carro['id'] = $maior_id + 1;
-    
-    // Adiciona à sessão para compatibilidade
-    $_SESSION['carros_adicionados'][] = $carro;
     
     // Adiciona ao arquivo
     $carros_arquivo[] = $carro;
@@ -159,21 +143,12 @@ function adicionarCarro($carro){
     // Retorna se salvou com sucesso
     return $salvou !== false;
 }
+
 // Função para editar um carro existente
 function editarCarro($carro) {
     // Carrega carros do arquivo
     $carros = carregarCarros();
     $editado = false;
-    
-    // Editar na sessão para compatibilidade
-    if (isset($_SESSION['carros_adicionados']) && !empty($_SESSION['carros_adicionados'])) {
-        foreach ($_SESSION['carros_adicionados'] as $key => $car) {
-            if ($car['id'] == $carro['id']) {
-                $_SESSION['carros_adicionados'][$key] = $carro;
-                break;
-            }
-        }
-    }
     
     // Editar no arquivo
     foreach ($carros as $key => $car) {
@@ -200,17 +175,6 @@ function excluirCarro($id) {
     // Carrega carros do arquivo
     $carros = carregarCarros();
     $excluido = false;
-    
-    // Excluir da sessão para compatibilidade
-    if (isset($_SESSION['carros_adicionados']) && !empty($_SESSION['carros_adicionados'])) {
-        foreach ($_SESSION['carros_adicionados'] as $key => $carro) {
-            if ($carro['id'] == $id) {
-                unset($_SESSION['carros_adicionados'][$key]);
-                $_SESSION['carros_adicionados'] = array_values($_SESSION['carros_adicionados']);
-                break;
-            }
-        }
-    }
     
     // Excluir do arquivo
     foreach ($carros as $key => $carro) {
@@ -240,20 +204,15 @@ function excluirCarro($id) {
 
 // Função para buscar carro específico (útil para detalhes)
 function buscarCarro($id) {
+    if (empty($id) || $id <= 0) {
+        return null;
+    }
+    
     // Verificar nos carros do arquivo
     $carros = carregarCarros();
     foreach ($carros as $carro) {
-        if ($carro['id'] == $id) {
+        if (isset($carro['id']) && (int)$carro['id'] === (int)$id) {
             return $carro;
-        }
-    }
-    
-    // Verificar na sessão para compatibilidade
-    if (isset($_SESSION['carros_adicionados']) && !empty($_SESSION['carros_adicionados'])) {
-        foreach ($_SESSION['carros_adicionados'] as $carro) {
-            if ($carro['id'] == $id) {
-                return $carro;
-            }
         }
     }
     
@@ -261,7 +220,7 @@ function buscarCarro($id) {
     global $carros;
     if (isset($carros) && is_array($carros)) {
         foreach ($carros as $carro) {
-            if ($carro['id'] == $id) {
+            if (isset($carro['id']) && (int)$carro['id'] === (int)$id) {
                 return $carro;
             }
         }
@@ -269,7 +228,6 @@ function buscarCarro($id) {
     
     return null;
 }
-
 // Verificar pastas de upload
 function verificarPastasUpload() {
     $upload_dir = 'img/carros/';
@@ -281,8 +239,4 @@ function verificarPastasUpload() {
 
 // Verificar pastas ao carregar este arquivo
 verificarPastasUpload();
-
-
-
-
 ?>

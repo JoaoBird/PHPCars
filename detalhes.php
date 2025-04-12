@@ -3,124 +3,257 @@ session_start();
 include_once 'dados.php';
 include_once 'funcoes.php';
 
-// Definir funções necessárias caso não existam no arquivo funcoes.php
-if (!function_exists('usuarioLogado')) {
-    function usuarioLogado() {
-        return isset($_SESSION['usuario_logado']) && $_SESSION['usuario_logado'] === true;
-    }
-}
-
-if (!function_exists('podeDarLance')) {
-    function podeDarLance($id) {
-        // Implementar lógica para verificar se usuário pode dar lance
-        // Por exemplo, verificar se o carro não pertence ao usuário logado
-        return true; // Substitua pela sua lógica
-    }
-}
 
 // Obter ID do carro
-$id = isset($_GET['id']) ? $_GET['id'] : '';
+$id = isset($_GET['id']) ? intval($_GET['id']) : 0;
 
-// Buscar carro pelo ID
-$carro = buscarCarroPorId($carros, $id);
-
-// Se não encontrar nos carros padrão, buscar nos adicionados
-if (!$carro && isset($_SESSION['carros_adicionados']) && is_array($_SESSION['carros_adicionados'])) {
-    $carro = buscarCarroPorId($_SESSION['carros_adicionados'], $id);
-}
-
-// Se carro não for encontrado, redirecionar para a página inicial
-if (!$carro) {
+// Se não há ID, redirecionar
+if ($id <= 0) {
     header('Location: index.php');
     exit;
 }
 
+// Buscar carro diretamente usando a função de busca unificada
+$carro = buscarCarro($id);
+
+// Se carro não for encontrado, redirecionar para a página inicial
+if (!$carro) {
+    // Para debug - remova após testar
+    echo "Carro não encontrado: ID = $id<br>";
+    echo "Dados disponíveis: <pre>";
+    print_r(carregarCarros());
+    echo "</pre>";
+    exit;
+    
+    // Descomente após testar
+     header('Location: index.php');
+     exit;
+}
+
+// Verificar se o usuário pode dar lance
+$pode_dar_lance = podeDarLance($id);
+
 // Incluir o header antes de qualquer saída HTML
 include_once 'header.php';
 
-// Verificar se o usuário pode dar lance - corrigido para usar $id em vez de $id_carro
-$pode_dar_lance = podeDarLance($id);
+
+// Preparar as imagens para exibição
+$imagens = [];
+if (isset($carro['imagens']) && is_array($carro['imagens'])) {
+    // Se há um array de imagens, use-o
+    $imagens = $carro['imagens'];
+} else if (!empty($carro['imagem'])) {
+    // Se há apenas uma imagem, coloque-a em um array
+    $imagens[] = $carro['imagem'];
+} else {
+    // Se não há imagens, use a imagem padrão
+    $imagens[] = 'img/carros/default.jpg';
+}
+
+// Obter a imagem principal (a primeira do array)
+$imagem_principal = !empty($imagens) ? $imagens[0] : 'img/carros/default.jpg';
+
+// Preparar todas as imagens para a galeria
+$imagens_galeria = $imagens;
 ?>
 
-<div class="car-details">
-    <h1><?php echo htmlspecialchars($carro['titulo']); ?></h1>
-    
-    <img class="car-image" src="<?php echo htmlspecialchars($carro['imagem']); ?>" 
-         alt="<?php echo htmlspecialchars($carro['titulo']); ?>">
-    
-    <div class="car-info">
-        <p><strong>Marca:</strong> <?php echo htmlspecialchars($carro['marca']); ?></p>
-        <p><strong>Modelo:</strong> <?php echo htmlspecialchars($carro['modelo']); ?></p>
-        <p><strong>Ano:</strong> <?php echo htmlspecialchars($carro['ano']); ?></p>
-        <p><strong>Categoria:</strong> <?php echo htmlspecialchars($carro['categoria']); ?></p>
-        <p><strong>Preço:</strong> R$ <?php echo number_format($carro['preco'], 2, ',', '.'); ?></p>
+<link rel="stylesheet" href="css/detalhes.css">
+
+<div class="container">
+    <div class="car-details-container">
+        <!-- Título e Informações Principais -->
+        <div class="car-header">
+            <h1><?php echo htmlspecialchars($carro['titulo']); ?></h1>
+            <div class="car-subtitle">
+                <span class="car-year"><?php echo htmlspecialchars($carro['ano']); ?></span>
+                <span class="car-make-model"><?php echo htmlspecialchars($carro['marca'] . ' ' . $carro['modelo']); ?></span>
+            </div>
+        </div>
+
+        <!-- Galeria de Imagens -->
+        <div class="car-gallery">
+            <!-- Imagem Principal -->
+            <div class="main-image">
+                <img src="<?php echo htmlspecialchars($imagem_principal); ?>" 
+                     alt="<?php echo htmlspecialchars($carro['titulo']); ?>" 
+                     id="main-car-image">
+            </div>
+
+            <!-- Miniaturas -->
+            <div class="thumbnails">
+                <?php foreach ($imagens_galeria as $index => $img): ?>
+                <div class="thumbnail <?php echo ($index === 0) ? 'active' : ''; ?>" 
+                     onclick="changeMainImage('<?php echo htmlspecialchars($img); ?>', this)">
+                    <img src="<?php echo htmlspecialchars($img); ?>" 
+                         alt="<?php echo htmlspecialchars($carro['titulo'] . ' - Imagem ' . ($index + 1)); ?>">
+                </div>
+                <?php endforeach; ?>
+                
+                <?php if (count($imagens_galeria) > 6): ?>
+                <div class="all-photos-btn" onclick="showAllPhotos()">
+                    Ver todas as fotos (<?php echo count($imagens_galeria); ?>)
+                </div>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <!-- Informações do Carro - Layout Grid -->
+        <div class="car-info-grid">
+            <div class="info-column">
+                <!-- Preço e Botões de Ação -->
+                <div class="price-section">
+                    <h2 class="car-price">R$ <?php echo number_format($carro['preco'], 2, ',', '.'); ?></h2>
+                    
+                    <?php if (usuarioLogado()): ?>
+                        <?php if ($pode_dar_lance): ?>
+                            <!-- Interface de lances -->
+                            <div class="bid-section">
+                                <form action="#" method="post" class="bid-form">
+                                    <input type="hidden" name="carro_id" value="<?php echo $id; ?>">
+                                    <input type="number" name="valor" class="bid-input" 
+                                           placeholder="Digite seu lance (R$)" min="<?php echo $carro['preco']; ?>" step="100">
+                                    <button type="submit" class="bid-button">Fazer Lance</button>
+                                </form>
+                            </div>
+                        <?php else: ?>
+                            <div class="alert alert-warning">Você não pode dar lance em seu próprio carro!</div>
+                        <?php endif; ?>
+                    <?php else: ?>
+                        <div class="login-prompt">
+                            <a href="login.php" class="login-btn">Faça login para dar lances</a>
+                        </div>
+                    <?php endif; ?>
+                </div>
+
+                <!-- Detalhes Principais -->
+                <div class="main-details">
+                    <div class="detail-item">
+                        <span class="detail-label">Marca</span>
+                        <span class="detail-value"><?php echo htmlspecialchars($carro['marca']); ?></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Modelo</span>
+                        <span class="detail-value"><?php echo htmlspecialchars($carro['modelo']); ?></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Ano</span>
+                        <span class="detail-value"><?php echo htmlspecialchars($carro['ano']); ?></span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-label">Categoria</span>
+                        <span class="detail-value"><?php echo htmlspecialchars($carro['categoria']); ?></span>
+                    </div>
+                </div>
+                
+                <!-- Especificações -->
+                <div class="specs-grid">
+                    <div class="spec-item">
+                        <span class="spec-label">Motor</span>
+                        <span class="spec-value"><?php echo isset($carro['motor']) ? htmlspecialchars($carro['motor']) : '1.6'; ?></span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Quilometragem</span>
+                        <span class="spec-value"><?php echo isset($carro['km']) ? htmlspecialchars($carro['km']) : '85.000 km'; ?></span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Câmbio</span>
+                        <span class="spec-value"><?php echo isset($carro['cambio']) ? htmlspecialchars($carro['cambio']) : 'Manual'; ?></span>
+                    </div>
+                    <div class="spec-item">
+                        <span class="spec-label">Combustível</span>
+                        <span class="spec-value"><?php echo isset($carro['combustivel']) ? htmlspecialchars($carro['combustivel']) : 'Gasolina'; ?></span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="info-column">
+                <!-- Lances Atuais -->
+                <?php if (usuarioLogado()): ?>
+                <div class="current-bids">
+                    <h3>Lances Atuais</h3>
+                    <div class="bid-list">
+                        <div class="bid-item">
+                            <span class="bid-user">usuario123</span>
+                            <span class="bid-amount">R$ <?php echo number_format($carro['preco'] - 500, 2, ',', '.'); ?></span>
+                            <span class="bid-time">há 2 horas</span>
+                        </div>
+                        <div class="bid-item">
+                            <span class="bid-user">colecionador</span>
+                            <span class="bid-amount">R$ <?php echo number_format($carro['preco'] - 1000, 2, ',', '.'); ?></span>
+                            <span class="bid-time">há 4 horas</span>
+                        </div>
+                    </div>
+                </div>
+                <?php endif; ?>
+                
+                <!-- Descrição -->
+                <?php if (isset($carro['descricao']) && !empty($carro['descricao'])): ?>
+                <div class="car-description">
+                    <h3>Descrição</h3>
+                    <div class="description-content">
+                        <?php echo nl2br(htmlspecialchars($carro['descricao'])); ?>
+                    </div>
+                </div>
+                <?php endif; ?>
+            </div>
+        </div>
         
-        <?php if (isset($carro['descricao'])): ?>
-            <div class="car-description">
-                <h3>Descrição</h3>
-                <p><?php echo nl2br(htmlspecialchars($carro['descricao'])); ?></p>
-            </div>
-        <?php endif; ?>
-    </div>
-    
-    <div class="specs-grid">
-        <div class="spec-item">
-            <h3>Motor</h3>
-            <p><?php echo isset($carro['motor']) ? htmlspecialchars($carro['motor']) : '1.6'; ?></p>
+        <!-- Botão de Voltar -->
+        <div class="back-button-container">
+            <a href="index.php" class="back-button">Voltar para Listagem</a>
         </div>
-        <div class="spec-item">
-            <h3>Quilometragem</h3>
-            <p><?php echo isset($carro['km']) ? htmlspecialchars($carro['km']) : '85.000 km'; ?></p>
-        </div>
-        <div class="spec-item">
-            <h3>Câmbio</h3>
-            <p><?php echo isset($carro['cambio']) ? htmlspecialchars($carro['cambio']) : 'Manual'; ?></p>
-        </div>
-        <div class="spec-item">
-            <h3>Combustível</h3>
-            <p><?php echo isset($carro['combustivel']) ? htmlspecialchars($carro['combustivel']) : 'Gasolina'; ?></p>
-        </div>
-    </div>
-    
-    <?php if (usuarioLogado()): ?>
-        <?php if ($pode_dar_lance): ?>
-            <!-- Interface de lances (simulação) -->
-            <div class="bid-section">
-                <h3>Fazer Lance</h3>
-                <form action="#" method="post">
-                    <input type="hidden" name="carro_id" value="<?php echo $id; ?>">
-                    <input type="number" name="valor" class="bid-input" 
-                           placeholder="Digite seu lance (R$)" min="<?php echo $carro['preco']; ?>" step="100">
-                    <button type="submit" class="bid-button">Fazer Lance</button>
-                </form>
-            </div>
-        <?php else: ?>
-            <div class="alert alert-warning">Você não pode dar lance em seu próprio carro!</div>
-        <?php endif; ?>
-        
-        <!-- Simulação de lances anteriores -->
-        <div class="current-bids">
-            <h3>Lances Atuais</h3>
-            <div class="bid-item">
-                <span class="bid-user">usuario123</span>
-                <span class="bid-amount">R$ <?php echo number_format($carro['preco'] - 500, 2, ',', '.'); ?></span>
-                <span class="bid-time">há 2 horas</span>
-            </div>
-            <div class="bid-item">
-                <span class="bid-user">colecionador</span>
-                <span class="bid-amount">R$ <?php echo number_format($carro['preco'] - 1000, 2, ',', '.'); ?></span>
-                <span class="bid-time">há 4 horas</span>
-            </div>
-        </div>
-    <?php else: ?>
-        <div class="login-prompt">
-            <p>Faça <a href="login.php">login</a> para dar lances neste veículo.</p>
-        </div>
-    <?php endif; ?>
-    
-    <div style="text-align: center; margin-top: 30px;">
-        <a href="index.php" class="back-button">Voltar para Listagem</a>
     </div>
 </div>
+
+<!-- Modal para exibir todas as fotos -->
+<div id="photosModal" class="photos-modal">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeModal()">&times;</span>
+        <h2>Todas as Fotos</h2>
+        <div class="modal-gallery">
+            <?php foreach ($imagens_galeria as $index => $img): ?>
+            <div class="modal-image">
+                <img src="<?php echo htmlspecialchars($img); ?>" 
+                     alt="<?php echo htmlspecialchars($carro['titulo'] . ' - Imagem ' . ($index + 1)); ?>">
+            </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</div>
+
+<script>
+// Função para trocar a imagem principal
+function changeMainImage(src, thumbnail) {
+    document.getElementById('main-car-image').src = src;
+    
+    // Remover classe active de todas as miniaturas
+    const thumbnails = document.querySelectorAll('.thumbnail');
+    thumbnails.forEach(thumb => {
+        thumb.classList.remove('active');
+    });
+    
+    // Adicionar classe active à miniatura clicada
+    if (thumbnail) {
+        thumbnail.classList.add('active');
+    }
+}
+
+// Funções para o modal de fotos
+function showAllPhotos() {
+    document.getElementById('photosModal').style.display = 'block';
+}
+
+function closeModal() {
+    document.getElementById('photosModal').style.display = 'none';
+}
+
+// Fechar modal ao clicar fora dele
+window.onclick = function(event) {
+    const modal = document.getElementById('photosModal');
+    if (event.target == modal) {
+        modal.style.display = 'none';
+    }
+}
+</script>
 
 <?php include_once 'footer.php'; ?>

@@ -12,13 +12,11 @@ $carro_editando = null;
 $id_editar = isset($_GET['editar']) ? intval($_GET['editar']) : 0;
 
 // Carregar carro para edição se necessário
-if ($id_editar > 0 && isset($_SESSION['carros_adicionados'])) {
-    foreach ($_SESSION['carros_adicionados'] as $carro) {
-        if ($carro['id'] == $id_editar) {
-            $carro_editando = $carro;
-            $modo = 'edicao';
-            break;
-        }
+if ($id_editar > 0) {
+    // Buscar o carro diretamente da função central de busca
+    $carro_editando = buscarCarro($id_editar);
+    if ($carro_editando) {
+        $modo = 'edicao';
     }
 }
 
@@ -125,18 +123,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
     }
-
-    $todos_carros = carregarCarros();
-
-    // Filtrar apenas os carros do usuário atual
-    $carros_usuario = [];
-    foreach ($todos_carros as $carro) {
-    if (isset($carro['usuario_id']) && $carro['usuario_id'] == $_SESSION['user_id']) {
-        $carros_usuario[] = $carro;
-    }
 }
 
+// Carregar todos os carros do arquivo para exibição na página
+$todos_carros = carregarCarros();
 
+// Filtrar apenas os carros do usuário atual
+$carros_usuario = [];
+if (isset($_SESSION['user_id'])) {
+    foreach ($todos_carros as $carro) {
+        if (isset($carro['usuario_id']) && $carro['usuario_id'] == $_SESSION['user_id']) {
+            $carros_usuario[] = $carro;
+        }
+    }
 }
 
 include_once 'header.php';
@@ -145,125 +144,118 @@ include_once 'header.php';
 <div class="container area-protegida">
     <h2 class="area-protegida-titulo">Área Protegida - Bem-vindo, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h2>
     
-    <div class="card">
-        <h3><?php echo $modo === 'edicao' ? 'Editar Carro' : 'Cadastrar Novo Carro'; ?></h3>
-        
-        <?php if (!empty($mensagem)): ?>
-            <div class="mensagem"><?php echo $mensagem; ?></div>
-        <?php endif; ?>
-        
-        <form method="post" action="protegido.php<?php echo $modo === 'edicao' ? '?editar=' . $id_editar : ''; ?>" enctype="multipart/form-data">
-            <?php if ($modo === 'edicao'): ?>
-                <input type="hidden" name="id" value="<?php echo $carro_editando['id']; ?>">
-            <?php endif; ?>
-            
-            <div class="form-group">
-                <label for="titulo">Título:</label>
-                <input type="text" id="titulo" name="titulo" required value="<?php echo $modo === 'edicao' ? htmlspecialchars($carro_editando['titulo']) : ''; ?>">
-            </div>
-            
-            <div class="form-group">
-                <label for="marca">Marca:</label>
-                <input type="text" id="marca" name="marca" required value="<?php echo $modo === 'edicao' ? htmlspecialchars($carro_editando['marca']) : ''; ?>">
-            </div>
-            
-            <div class="form-group">
-                <label for="modelo">Modelo:</label>
-                <input type="text" id="modelo" name="modelo" required value="<?php echo $modo === 'edicao' ? htmlspecialchars($carro_editando['modelo']) : ''; ?>">
-            </div>
-            
-            <div class="form-group">
-                <label for="ano">Ano:</label>
-                <input type="text" id="ano" name="ano" required value="<?php echo $modo === 'edicao' ? htmlspecialchars($carro_editando['ano']) : ''; ?>">
-            </div>
-            
-            <div class="form-group">
-                <label for="categoria">Categoria:</label>
-                <select id="categoria" name="categoria" required>
-                    <option value="">Selecione uma categoria</option>
-                    <?php foreach ($categorias as $cat): ?>
-                        <option value="<?php echo htmlspecialchars($cat); ?>" <?php echo ($modo === 'edicao' && $carro_editando['categoria'] === $cat) ? 'selected' : ''; ?>>
-                            <?php echo htmlspecialchars($cat); ?>
-                        </option>
-                    <?php endforeach; ?>
-                </select>
-            </div>
-            
-            <div class="form-group">
-                <label for="preco">Preço (R$):</label>
-                <input type="number" id="preco" name="preco" min="1" step="0.01" required value="<?php echo $modo === 'edicao' ? $carro_editando['preco'] : ''; ?>">
-            </div>
-            
-            <div class="form-group">
-                <label for="imagem_upload">Imagem do Veículo:</label>
-                <input type="file" id="imagem_upload" name="imagem_upload" accept="image/jpeg,image/jpg,image/png,image/webp" class="file-input">
-                <div class="file-custom">Escolher arquivo</div>
+    <!-- Novo layout de duas colunas -->
+    <div class="area-protegida-content">
+        <!-- Coluna esquerda - Formulário -->
+        <div class="form-column">
+            <div class="card">
+                <h3><?php echo $modo === 'edicao' ? 'Editar Carro' : 'Cadastrar Novo Carro'; ?></h3>
                 
-                <div class="separator">ou</div>
-                
-                <label for="imagem">URL da Imagem:</label>
-                <input type="text" id="imagem" name="imagem" placeholder="img/carros/default.jpg" value="<?php echo $modo === 'edicao' ? htmlspecialchars($carro_editando['imagem']) : ''; ?>">
-                <small>Deixe em branco para usar imagem padrão ou faça upload acima</small>
-                
-                <?php if ($modo === 'edicao' && !empty($carro_editando['imagem'])): ?>
-                <div class="image-preview">
-                    <p>Imagem atual:</p>
-                    <img src="<?php echo htmlspecialchars($carro_editando['imagem']); ?>" alt="Imagem atual">
-                </div>
+                <?php if (!empty($mensagem)): ?>
+                    <div class="mensagem"><?php echo $mensagem; ?></div>
                 <?php endif; ?>
-            </div>
-            
-            <div class="form-actions">
-                <button type="submit" class="btn btn-primary"><?php echo $modo === 'edicao' ? 'Atualizar' : 'Cadastrar'; ?> Carro</button>
-                <?php if ($modo === 'edicao'): ?>
-                    <a href="protegido.php" class="btn btn-secondary">Cancelar</a>
-                <?php endif; ?>
-            </div>
-        </form>
-    </div>
-    
-    <!-- Listar carros adicionados pelo usuário -->
-<!-- Listar carros adicionados pelo usuário -->
-<div class="user-cars">
-    <h3>Seus Carros Cadastrados</h3>
-    
-    <?php 
-    // Carregar todos os carros do arquivo
-    $todos_carros = carregarCarros();
-    
-    // Filtrar apenas os carros do usuário atual (se estiver usando ID de usuário)
-    $carros_usuario = [];
-    if (isset($_SESSION['user_id'])) {
-        foreach ($todos_carros as $carro) {
-            if (isset($carro['usuario_id']) && $carro['usuario_id'] == $_SESSION['user_id']) {
-                $carros_usuario[] = $carro;
-            }
-        }
-    } else {
-        // Usar carros da sessão para compatibilidade
-        $carros_usuario = isset($_SESSION['carros_adicionados']) ? $_SESSION['carros_adicionados'] : [];
-    }
-    
-    if (!empty($carros_usuario)): 
-    ?>
-        <div class="grid-container">
-            <?php foreach ($carros_usuario as $carro): ?>
-                <div class="grid-item">
-                    <img src="<?php echo htmlspecialchars($carro['imagem']); ?>" alt="<?php echo htmlspecialchars($carro['titulo']); ?>">
-                    <h4><?php echo htmlspecialchars($carro['titulo']); ?></h4>
-                    <p>Ano: <?php echo htmlspecialchars($carro['ano']); ?></p>
-                    <p>R$ <?php echo number_format($carro['preco'], 2, ',', '.'); ?></p>
-                    <div class="car-actions">
-                        <a href="detalhes.php?id=<?php echo $carro['id']; ?>" class="action-btn view-btn">Visualizar</a>
-                        <a href="protegido.php?editar=<?php echo $carro['id']; ?>" class="action-btn edit-btn">Editar</a>
-                        <a href="javascript:void(0)" onclick="confirmarExclusao(<?php echo $carro['id']; ?>, '<?php echo addslashes($carro['titulo']); ?>')" class="action-btn delete-btn">Excluir</a>
+                
+                <form method="post" action="protegido.php<?php echo $modo === 'edicao' ? '?editar=' . $id_editar : ''; ?>" enctype="multipart/form-data">
+                    <?php if ($modo === 'edicao' && $carro_editando): ?>
+                        <input type="hidden" name="id" value="<?php echo $carro_editando['id']; ?>">
+                    <?php endif; ?>
+                    
+                    <div class="form-group">
+                        <label for="titulo">Título:</label>
+                        <input type="text" id="titulo" name="titulo" required value="<?php echo $modo === 'edicao' && $carro_editando ? htmlspecialchars($carro_editando['titulo']) : ''; ?>">
                     </div>
-                </div>
-            <?php endforeach; ?>
+                    
+                    <div class="form-group">
+                        <label for="marca">Marca:</label>
+                        <input type="text" id="marca" name="marca" required value="<?php echo $modo === 'edicao' && $carro_editando ? htmlspecialchars($carro_editando['marca']) : ''; ?>">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="modelo">Modelo:</label>
+                        <input type="text" id="modelo" name="modelo" required value="<?php echo $modo === 'edicao' && $carro_editando ? htmlspecialchars($carro_editando['modelo']) : ''; ?>">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="ano">Ano:</label>
+                        <input type="text" id="ano" name="ano" required value="<?php echo $modo === 'edicao' && $carro_editando ? htmlspecialchars($carro_editando['ano']) : ''; ?>">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="categoria">Categoria:</label>
+                        <select id="categoria" name="categoria" required>
+                            <option value="">Selecione uma categoria</option>
+                            <?php foreach ($categorias as $cat): ?>
+                                <option value="<?php echo htmlspecialchars($cat); ?>" <?php echo ($modo === 'edicao' && $carro_editando && $carro_editando['categoria'] === $cat) ? 'selected' : ''; ?>>
+                                    <?php echo htmlspecialchars($cat); ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="preco">Preço (R$):</label>
+                        <input type="number" id="preco" name="preco" min="1" step="0.01" required value="<?php echo $modo === 'edicao' && $carro_editando ? $carro_editando['preco'] : ''; ?>">
+                    </div>
+                    
+                    <div class="form-group">
+                    <label for="imagem_upload">Imagem do Veículo:</label>
+                    <input type="file" id="imagem_upload" name="imagem_upload" accept="image/jpeg,image/jpg,image/png,image/webp" class="file-input hidden">
+                    <div class="file-custom">Escolher arquivo</div>
+                    
+                    <!-- Removido o campo de URL e separador, mantendo apenas o aviso -->
+                    <small>Deixe em branco para usar imagem padrão ou faça upload acima</small>
+                    
+                    <?php if ($modo === 'edicao' && $carro_editando && !empty($carro_editando['imagem'])): ?>
+                    <div class="image-preview">
+                        <p>Imagem atual:</p>
+                        <img src="<?php echo htmlspecialchars($carro_editando['imagem']); ?>" alt="Imagem atual">
+                    </div>
+                    <?php endif; ?>
+                    </div>
+                            
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary"><?php echo $modo === 'edicao' ? 'Atualizar' : 'Cadastrar'; ?> Carro</button>
+                        <?php if ($modo === 'edicao'): ?>
+                            <a href="protegido.php" class="btn btn-secondary">Cancelar</a>
+                        <?php endif; ?>
+                    </div>
+                </form>
+            </div>
         </div>
-    <?php else: ?>
-        <p class="no-cars-message">Você ainda não cadastrou nenhum carro.</p>
-    <?php endif; ?>
+        
+        <!-- Coluna direita - Lista de carros -->
+        <div class="cars-column">
+            <div class="user-cars">
+                <h3>Seus Carros Cadastrados</h3>
+                
+                <?php if (!empty($carros_usuario)): ?>
+                    <div class="grid-container">
+                        <?php foreach ($carros_usuario as $carro): ?>
+                            <div class="grid-item">
+                            <img src="<?php echo htmlspecialchars($carro['imagem']); ?>" alt="<?php echo htmlspecialchars($carro['titulo']); ?>">
+                            <div class="grid-item-content">
+                                <div class="car-info">
+                                    <h4><?php echo htmlspecialchars($carro['titulo']); ?></h4>
+                                    <p>Marca: <?php echo htmlspecialchars($carro['marca']); ?></p>
+                                    <p>Modelo: <?php echo htmlspecialchars($carro['modelo']); ?></p>
+                                    <p>Ano: <?php echo htmlspecialchars($carro['ano']); ?></p>
+                                    <p class="car-price">R$ <?php echo number_format($carro['preco'], 2, ',', '.'); ?></p>
+                                    <p>Categoria: <?php echo htmlspecialchars($carro['categoria']); ?></p>
+                                </div>
+                                <div class="car-actions">
+                                <a href="detalhes.php?id=<?php echo $carro['id']; ?>" class="action-btn view-btn">Visualizar</a>                                    <a href="protegido.php?editar=<?php echo $carro['id']; ?>" class="action-btn edit-btn">Editar</a>
+                                    <a href="javascript:void(0)" onclick="confirmarExclusao(<?php echo $carro['id']; ?>, '<?php echo addslashes(htmlspecialchars($carro['titulo'])); ?>')" class="action-btn delete-btn">Excluir</a>
+                                </div>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                <?php else: ?>
+                    <p class="no-cars-message">Você ainda não cadastrou nenhum carro.</p>
+                <?php endif; ?>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>

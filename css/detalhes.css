@@ -1,0 +1,440 @@
+/* detalhes.css - Versão com tema escuro */
+body {
+    background-color: #0d1117; /* Fundo escuro similar ao da sua página inicial */
+    color: #e6e6e6;
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+}
+
+.container {
+    max-width: 100%; /* Estendendo para toda a largura */
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.car-details-container {
+    background: #171c26; /* Fundo escuro para o container */
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Header */
+.car-header {
+    padding: 20px;
+    border-bottom: 1px solid #2d3748;
+}
+
+.car-header h1 {
+    font-size: 28px;
+    margin: 0 0 5px 0;
+    color: #fff;
+}
+
+.car-subtitle {
+    display: flex;
+    gap: 10px;
+    font-size: 18px;
+    color: #a0aec0;
+}
+
+/* Galeria de Imagens */
+.car-gallery {
+    position: relative;
+}
+
+.main-image {
+    width: 100%;
+    height: 500px;
+    overflow: hidden;
+    position: relative;
+    background-color: #252d3d;
+}
+
+.main-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.thumbnails {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 15px;
+    background-color: #131926;
+    border-bottom: 1px solid #2d3748;
+}
+
+.thumbnail {
+    width: calc(16.666% - 8px);
+    height: 80px;
+    overflow: hidden;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.thumbnail:hover {
+    opacity: 0.9;
+}
+
+.thumbnail.active {
+    border-color: #3498db;
+}
+
+.thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.all-photos-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: calc(16.666% - 8px);
+    height: 80px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 4px;
+    text-align: center;
+    transition: background-color 0.2s ease;
+}
+
+.all-photos-btn:hover {
+    background-color: rgba(0, 0, 0, 0.8);
+}
+
+/* Layout de Informações */
+.car-info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    padding: 20px;
+}
+
+/* Coluna de informações */
+.info-column {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Seção de preço */
+.price-section {
+    padding: 20px;
+    background-color: #1e2635;
+    border-radius: 8px;
+}
+
+.car-price {
+    font-size: 32px;
+    font-weight: bold;
+    margin: 0 0 15px 0;
+    color: #3498db; /* Tom azul para destaque de preço */
+}
+
+.bid-form {
+    display: flex;
+    gap: 10px;
+}
+
+.bid-input {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #3b4858;
+    background-color: #13192d;
+    color: white;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.bid-button {
+    padding: 12px 20px;
+    background-color: #3498db;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.bid-button:hover {
+    background-color: #2980b9;
+}
+
+.login-btn {
+    display: block;
+    padding: 12px 20px;
+    background-color: #3498db;
+    color: white;
+    text-align: center;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+}
+
+.login-btn:hover {
+    background-color: #2980b9;
+}
+
+/* Detalhes principais */
+.main-details {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.detail-item {
+    padding: 15px;
+    background-color: #1e2635;
+    border-radius: 4px;
+}
+
+.detail-label {
+    display: block;
+    font-size: 14px;
+    color: #a0aec0;
+    margin-bottom: 5px;
+}
+
+.detail-value {
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
+}
+
+/* Especificações */
+.specs-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.spec-item {
+    padding: 15px;
+    background-color: #1e2635;
+    border-radius: 4px;
+}
+
+.spec-label {
+    display: block;
+    font-size: 14px;
+    color: #a0aec0;
+    margin-bottom: 5px;
+}
+
+.spec-value {
+    font-size: 18px;
+    font-weight: bold;
+    color: #fff;
+}
+
+/* Lances atuais */
+.current-bids {
+    padding: 20px;
+    background-color: #1e2635;
+    border-radius: 8px;
+}
+
+.current-bids h3 {
+    margin-top: 0;
+    font-size: 20px;
+    color: #fff;
+    margin-bottom: 15px;
+}
+
+.bid-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.bid-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px;
+    background-color: #131926;
+    border-radius: 4px;
+    border-left: 4px solid #3498db;
+}
+
+.bid-user {
+    font-weight: bold;
+    color: #e6e6e6;
+}
+
+.bid-amount {
+    font-weight: bold;
+    color: #2ecc71;
+}
+
+.bid-time {
+    color: #a0aec0;
+    font-size: 14px;
+}
+
+/* Descrição */
+.car-description {
+    padding: 20px;
+    background-color: #1e2635;
+    border-radius: 8px;
+}
+
+.car-description h3 {
+    margin-top: 0;
+    font-size: 20px;
+    color: #fff;
+    margin-bottom: 15px;
+}
+
+.description-content {
+    line-height: 1.6;
+    color: #cbd5e0;
+}
+
+/* Botão de voltar */
+.back-button-container {
+    padding: 20px;
+    text-align: center;
+}
+
+.back-button {
+    display: inline-block;
+    padding: 12px 24px;
+    background-color: #3498db;
+    color: white;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: background-color 0.2s ease;
+}
+
+.back-button:hover {
+    background-color: #2980b9;
+}
+
+/* Modal de fotos */
+.photos-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0, 0, 0, 0.9);
+}
+
+.modal-content {
+    position: relative;
+    background-color: #171c26;
+    margin: 50px auto;
+    padding: 20px;
+    width: 90%;
+    max-width: 1200px;
+    border-radius: 8px;
+    color: #fff;
+}
+
+.close-modal {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    color: #fff;
+    font-size: 30px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.modal-gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.modal-image {
+    height: 250px;
+    overflow: hidden;
+    border-radius: 4px;
+}
+
+.modal-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Responsividade */
+@media (max-width: 992px) {
+    .car-info-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .thumbnail {
+        width: calc(25% - 8px);
+    }
+    
+    .all-photos-btn {
+        width: calc(25% - 8px);
+    }
+}
+
+@media (max-width: 768px) {
+    .main-image {
+        height: 350px;
+    }
+    
+    .thumbnail {
+        width: calc(33.333% - 8px);
+    }
+    
+    .all-photos-btn {
+        width: calc(33.333% - 8px);
+    }
+}
+
+@media (max-width: 576px) {
+    .main-details,
+    .specs-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .thumbnail {
+        width: calc(50% - 8px);
+    }
+    
+    .all-photos-btn {
+        width: calc(50% - 8px);
+    }
+    
+    .bid-form {
+        flex-direction: column;
+    }
+}
+
+/* Alertas e mensagens */
+.alert {
+    padding: 15px;
+    border-radius: 4px;
+    margin-bottom: 15px;
+}
+
+.alert-warning {
+    background-color: rgba(243, 156, 18, 0.2);
+    border-left: 4px solid #f39c12;
+    color: #f39c12;
+}

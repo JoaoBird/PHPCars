@@ -1,445 +1,80 @@
-/* Estilos para padronizar o formulário da área protegida */
-.card {
-    background-color: #1a2135;
-    border-radius: 10px;
-    width: 100%;
-    max-width: 600px;
-    padding: 40px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    margin: 30px auto;
-}
+/* Melhorias para harmonização da página protegida */
 
-.card h3 {
+/* Estilização geral da página */
+body {
+    background: linear-gradient(135deg, #0f1726 0%, #1a2135 100%);
     color: #fff;
-    text-align: center;
-    margin-bottom: 30px;
-    font-size: 24px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
 }
 
-.form-group {
-    margin-bottom: 25px;
-}
-
-.form-group label {
-    display: block;
-    color: #b7c0d8;
-    margin-bottom: 8px;
-    font-size: 14px;
-}
-
-.form-group input,
-.form-group select {
-    width: 100%;
-    padding: 12px 15px;
-    border-radius: 25px;
-    border: 1px solid #384057;
-    background-color: #2a324e;
-    color: #fff;
-    font-size: 14px;
-    transition: border-color 0.3s ease;
-}
-
-.form-group input:focus,
-.form-group select:focus {
-    border-color: #7749F8;
-    outline: none;
-}
-
-.form-group small {
-    display: block;
-    color: #b7c0d8;
-    margin-top: 5px;
-    font-size: 12px;
-}
-
-.btn {
-    width: 100%;
-    background-color: #7749F8;
-    color: #fff;
-    border: none;
-    padding: 12px;
-    border-radius: 25px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    margin-top: 10px;
-}
-
-.btn:hover {
-    background-color: #6a3ce0;
-}
-
-.mensagem {
-    background-color: rgba(119, 73, 248, 0.2);
-    border-left: 4px solid #7749F8;
-    color: #fff;
-    padding: 10px 15px;
-    margin-bottom: 20px;
-    border-radius: 0 5px 5px 0;
-    font-size: 14px;
-}
-
-/* Estilos para a listagem de carros */
-.user-cars {
-    margin-top: 40px;
-}
-
-.user-cars h3 {
-    color: #fff;
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.grid-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
-}
-
-.grid-item {
-    background-color: #1a2135;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-.grid-item img {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-    border-radius: 5px;
-}
-
-.grid-item h3 {
-    font-size: 18px;
-    margin: 15px 0 10px;
-}
-
-.grid-item p {
-    color: #b7c0d8;
-    margin: 5px 0;
-}
-
-.enter-car-btn {
-    display: block;
-    background-color: #7749F8;
-    color: #fff;
-    text-align: center;
-    padding: 10px;
-    border-radius: 25px;
-    text-decoration: none;
-    margin-top: 15px;
-    font-weight: 600;
-    transition: background-color 0.3s ease;
-}
-
-.enter-car-btn:hover {
-    background-color: #6a3ce0;
-}
-
-/* Ajustes para centralizar melhor o formulário e remover botão "Minha Área" nesta tela */
-
-/* Ocultar o botão "Minha Área" na página protegida */
-.area-protegida .minha-area-btn {
-    display: none;
-}
-
-/* Centralizar melhor o formulário */
 .container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
     max-width: 1200px;
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 30px;
 }
 
-/* Ajustes no card do formulário */
-.card {
-    background-color: #1a2135;
-    border-radius: 15px;
-    width: 100%;
-    max-width: 600px;
-    padding: 40px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-    margin: 30px auto;
+.area-protegida {
+    padding-top: 40px;
+    padding-bottom: 60px;
+}
+
+.area-protegida-titulo {
+    margin-bottom: 40px;
+    color: #fff;
+    font-size: 28px;
+    font-weight: 600;
     position: relative;
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-/* Garantir que o título do formulário esteja centralizado */
-.card h3 {
+    padding-bottom: 15px;
     text-align: center;
-    margin-bottom: 30px;
-    position: relative;
 }
 
-/* Adicionar uma linha decorativa após o título */
-.card h3:after {
+.area-protegida-titulo:after {
     content: '';
     position: absolute;
-    width: 60px;
-    height: 3px;
+    width: 80px;
+    height: 4px;
     background: #7749F8;
-    bottom: -10px;
+    bottom: 0;
     left: 50%;
     transform: translateX(-50%);
     border-radius: 2px;
 }
 
-/* Ajustar o título da área protegida */
-.area-protegida-titulo {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #fff;
-    font-size: 24px;
+.area-protegida-content {
+    display: flex;
+    flex-direction: row;
+    gap: 40px;
+    margin-top: 40px;
+    width: 100%; /* Ensure it doesn't exceed container width */
+    box-sizing: border-box; /* Include padding in width calculation */
+    overflow-x: hidden; /* Prevent horizontal scroll */
 }
 
-/* Alternativa para esconder o botão Minha Área usando seletores mais específicos */
-header .minha-area-btn,
-nav .minha-area-btn,
-.area-protegida .minha-area-btn,
-.minha-area-btn {
-    display: none !important;
+.form-column {
+    flex: 1; /* Alterado para distribuição proporcional */
+    width: 50%; /* Largura fixa */
 }
 
-/* Ajuste para o cabeçalho se necessário */
-.header-container {
-    justify-content: space-between;
+.cars-column {
+    flex: 1;
+    width: 50%;
+    max-width: 100%; /* Add this to prevent overflow */
+    box-sizing: border-box; /* Add this to include padding in width calculations */
 }
 
-/* Ajustes para telas menores */
-@media (max-width: 768px) {
-    .card {
-        padding: 30px 20px;
-    }
-}
-
-
-    /* Melhorias de visual para o formulário */
-
-    body {
-        background: linear-gradient(135deg, #0f1726 0%, #1a2135 100%);
-    }
-    
-    .container {
-        max-width: 700px;
-        margin: 0 auto;
-        padding: 30px 20px;
-    }
-    
-    .card {
-        background: linear-gradient(135deg, #1a2135 0%, #232b45 100%);
-        border-radius: 15px;
-        width: 100%;
-        max-width: 600px;
-        padding: 40px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-        margin: 30px auto;
-        border: 1px solid rgba(255, 255, 255, 0.05);
-    }
-    
-    .card h3 {
-        color: #fff;
-        text-align: center;
-        margin-bottom: 40px;
-        font-size: 28px;
-        font-weight: 600;
-        position: relative;
-        padding-bottom: 15px;
-    }
-    
-    .card h3:after {
-        content: '';
-        position: absolute;
-        width: 60px;
-        height: 3px;
-        background: #7749F8;
-        bottom: 0;
-        left: 50%;
-        transform: translateX(-50%);
-        border-radius: 2px;
-    }
-    
-    .form-group {
-        margin-bottom: 25px;
-        position: relative;
-    }
-    
-    .form-group label {
-        display: block;
-        color: #b7c0d8;
-        margin-bottom: 10px;
-        font-size: 14px;
-        font-weight: 500;
-        transition: all 0.3s ease;
-    }
-    
-    .form-group input,
-    .form-group select {
-        width: 100%;
-        padding: 14px 18px;
-        border-radius: 12px;
-        border: 1px solid #384057;
-        background-color: rgba(42, 50, 78, 0.7);
-        color: #fff;
-        font-size: 15px;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) inset;
-    }
-    
-    .form-group input:focus,
-    .form-group select:focus {
-        border-color: #7749F8;
-        box-shadow: 0 0 0 2px rgba(119, 73, 248, 0.2), 0 2px 5px rgba(0, 0, 0, 0.2) inset;
-        outline: none;
-        transform: translateY(-2px);
-    }
-    
-    .form-group input::placeholder {
-        color: rgba(183, 192, 216, 0.5);
-    }
-    
-    .form-group small {
-        display: block;
-        color: #b7c0d8;
-        margin-top: 8px;
-        font-size: 12px;
-        font-style: italic;
-    }
-    
-    /* Estilização do botão */
-    .btn {
-        width: 100%;
-        background: linear-gradient(135deg, #7749F8 0%, #6a3ce0 100%);
-        color: #fff;
-        border: none;
-        padding: 16px;
-        border-radius: 12px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        margin-top: 20px;
-        box-shadow: 0 5px 15px rgba(119, 73, 248, 0.4);
-        letter-spacing: 0.5px;
-    }
-    
-    .btn:hover {
-        background: linear-gradient(135deg, #6a3ce0 0%, #5c33c8 100%);
-        transform: translateY(-2px);
-        box-shadow: 0 8px 20px rgba(119, 73, 248, 0.5);
-    }
-    
-    .btn:active {
-        transform: translateY(0);
-        box-shadow: 0 2px 8px rgba(119, 73, 248, 0.4);
-    }
-    
-    /* Preview de imagem */
-    .image-preview {
-        display: none;
-        width: 100%;
-        max-height: 150px;
-        border-radius: 8px;
-        overflow: hidden;
-        margin-top: 10px;
-        border: 1px solid #384057;
-    }
-    
-    .image-preview img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-    }
-    
-    /* Indicador de progresso */
-    .progress-container {
-        margin-bottom: 30px;
-    }
-    
-    .progress-steps {
-        display: flex;
-        justify-content: space-between;
-    }
-    
-    .progress-step {
-        flex: 1;
-        text-align: center;
-        font-size: 12px;
-        color: #b7c0d8;
-        position: relative;
-    }
-    
-    .progress-step.active {
-        color: #7749F8;
-        font-weight: bold;
-    }
-    
-    .progress-step:before {
-        content: '';
-        height: 3px;
-        width: 100%;
-        background-color: #384057;
-        position: absolute;
-        left: 0;
-        top: -15px;
-    }
-    
-    .progress-step.active:before {
-        background-color: #7749F8;
-    }
-    
-    /* Responsividade para celulares */
-    @media (max-width: 480px) {
-        .card {
-            padding: 25px 15px;
-        }
-        
-        .form-group input,
-        .form-group select {
-            padding: 12px 15px;
-        }
-    }
-
-    /* Estilos para a página protegida */
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-}
-
-.area-protegida-titulo {
-    text-align: center;
-    margin-bottom: 30px;
-    color: #fff;
-    font-size: 24px;
-}
-
-.card {
-    background: linear-gradient(135deg, #1a2135 0%, #232b45 100%);
-    border-radius: 15px;
-    width: 100%;
-    max-width: 700px;
-    padding: 40px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-    margin: 30px auto;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.card h3 {
+/* Ajustes para o título e estrutura dos carros */
+.user-cars h3 {
     color: #fff;
     text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 35px;
     font-size: 24px;
     position: relative;
     padding-bottom: 15px;
 }
-
-.card h3:after {
+  
+.user-cars h3:after {
     content: '';
     position: absolute;
     width: 60px;
@@ -450,15 +85,169 @@ nav .minha-area-btn,
     transform: translateX(-50%);
     border-radius: 2px;
 }
+  
+/* Layout vertical para os carros */
+.grid-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    width: 100%;
+    max-height: 750px;
+    overflow-y: auto;
+    padding: 20px;
+    box-sizing: border-box;
+    padding-bottom: 40px;
+    max-width: 100%; /* Add this to prevent overflow */
+}
+  
+.grid-item {
+    display: flex;
+    background: linear-gradient(145deg, #1a2135 0%, #232b45 100%);
+    border-radius: 15px;
+    overflow: hidden; /* Alterar de 'visible' para 'hidden' */
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    transition: all 0.4s ease;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative;
+    width: 100%;
+    height: auto;
+    min-height: 320px; /* Aumentar a altura mínima */
+    margin-bottom: 20px; /* Reduzir espaçamento entre itens */
+    box-sizing: border-box;
+}
 
-.mensagem {
-    background-color: rgba(119, 73, 248, 0.2);
-    border-left: 4px solid #7749F8;
+.grid-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(119, 73, 248, 0.3);
+}
+
+/* Ajustes nas imagens dos carros */
+.grid-item img {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-right: 2px solid rgba(119, 73, 248, 0.3);
+    flex-shrink: 0; /* Impede que a imagem encolha */
+}
+
+.grid-item-content {
+    flex: 1;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Distribui o conteúdo verticalmente */
+    height: 100%;
+}
+
+.grid-item h4 {
     color: #fff;
-    padding: 12px 15px;
-    margin-bottom: 20px;
-    border-radius: 0 5px 5px 0;
+    margin: 0 0 15px 0;
+    font-size: 22px;
+    font-weight: 600;
+}
+  
+.grid-item p {
+    color: #b7c0d8;
+    margin: 5px 0;
+    font-size: 15px;
+}
+
+.car-info {
+    flex: 1; /* Permite que a área de informações se expanda */
+}
+/* Reposicionamento nos botões de ação */
+.car-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    justify-content: space-between;
+    width: 100%;
+    position: relative;
+    bottom: 0;
+    z-index: 10; /* Add this to ensure buttons appear above other elements */
+    left: -150px;
+}
+
+.action-btn {
+    flex: 1;
+    min-width: 90px;
+    padding: 10px 12px;
+    text-align: center;
+    border-radius: 8px;
     font-size: 14px;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    white-space: nowrap;
+    display: inline-block;
+    transition: all 0.3s ease;
+    z-index: 2; /* Garantir que os botões fiquem acima de outros elementos */
+}
+
+.view-btn {
+    background: #384057;
+    color: #fff !important; /* Força a cor do texto */
+}
+  
+.view-btn:hover {
+    background: #455273;
+    transform: translateY(-2px); /* Efeito ao passar o mouse */
+}
+
+.edit-btn {
+    background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+    color: #fff !important;
+}
+
+.edit-btn:hover {
+    background: linear-gradient(135deg, #0069d9 0%, #004494 100%);
+    transform: translateY(-2px);
+}
+
+.delete-btn {
+    background: linear-gradient(135deg, #dc3545 0%, #b02a37 100%);
+    color: #fff !important;
+}
+
+.delete-btn:hover {
+    background: linear-gradient(135deg, #c82333 0%, #a01e2c 100%);
+    transform: translateY(-2px);
+}
+
+/* Melhorias no formulário */
+.card {
+    background: linear-gradient(135deg, #1a2135 0%, #232b45 100%);
+    border-radius: 20px;
+    width: 100%;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(119, 73, 248, 0.1);
+    padding: 30px;
+    margin-bottom: 30px;
+    box-sizing: border-box;
+}
+
+.card h3 {
+    color: #fff;
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 24px;
+    font-weight: 600;
+    position: relative;
+    padding-bottom: 15px;
+}
+
+.card h3:after {
+    content: '';
+    position: absolute;
+    width: 70px;
+    height: 3px;
+    background: #7749F8;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    border-radius: 2px;
 }
 
 .form-group {
@@ -469,112 +258,130 @@ nav .minha-area-btn,
 .form-group label {
     display: block;
     color: #b7c0d8;
-    margin-bottom: 8px;
-    font-size: 14px;
+    margin-bottom: 10px;
+    font-size: 15px;
     font-weight: 500;
+    transition: all 0.3s ease;
 }
 
 .form-group input,
 .form-group select {
     width: 100%;
-    padding: 14px 15px;
-    border-radius: 12px;
+    padding: 14px 18px;
+    border-radius: 10px;
     border: 1px solid #384057;
     background-color: rgba(42, 50, 78, 0.7);
     color: #fff;
-    font-size: 15px;
+    font-size: 16px;
     transition: all 0.3s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2) inset;
+    box-sizing: border-box;
 }
 
 .form-group input:focus,
 .form-group select:focus {
     border-color: #7749F8;
-    box-shadow: 0 0 0 2px rgba(119, 73, 248, 0.2);
+    box-shadow: 0 0 0 3px rgba(119, 73, 248, 0.2), 0 2px 5px rgba(0, 0, 0, 0.2) inset;
     outline: none;
 }
 
 .form-group small {
     display: block;
     color: #b7c0d8;
-    margin-top: 6px;
+    margin-top: 8px;
     font-size: 12px;
     font-style: italic;
 }
 
-/* Estilo para upload de arquivos */
-.form-group .file-input {
-    position: absolute;
-    width: 0.1px;
-    height: 0.1px;
-    opacity: 0;
-    overflow: hidden;
-    z-index: -1;
+.btn {
+    min-width: 140px;
+    background: linear-gradient(135deg, #7749F8 0%, #6a3ce0 100%);
+    color: #fff;
+    border: none;
+    padding: 14px 22px;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 15px rgba(119, 73, 248, 0.3);
+    text-align: center;
+    letter-spacing: 0.5px;
 }
 
-.form-group .file-custom {
-    display: inline-block;
-    cursor: pointer;
-    padding: 10px 16px;
-    background: #2a324e;
+.btn:hover {
+    background: linear-gradient(135deg, #6a3ce0 0%, #5c33c8 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 18px rgba(119, 73, 248, 0.4);
+}
+
+.form-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
+}
+
+/* Mensagem quando não há carros */
+.no-cars-message {
+    text-align: center;
     color: #b7c0d8;
+    font-style: italic;
+    padding: 30px;
+    background: rgba(42, 50, 78, 0.3);
+    border-radius: 15px;
+    border: 1px dashed #384057;
+    font-size: 16px;
+}
+
+/* Melhorias no upload de imagem */
+.form-group .file-custom {
+    display: block;
+    cursor: pointer;
+    padding: 16px 20px;
+    background: #384057;
+    color: #fff;
     border-radius: 12px;
-    border: 1px solid #384057;
+    border: 1px solid #5a6485;
     transition: all 0.3s ease;
-    margin-bottom: 15px;
-    width: 100%;
+    margin: 0 auto;
+    max-width: 300px;
     text-overflow: ellipsis;
     white-space: nowrap;
     overflow: hidden;
+    text-align: center;
+    font-size: 15px;
+    font-weight: 500;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 .form-group .file-custom:hover {
-    background: #384057;
+    background: #455273;
     color: #fff;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
 }
 
+/* Estilo quando um arquivo é selecionado */
 .form-group .file-custom.has-file {
-    background: rgba(119, 73, 248, 0.2);
+    background: rgba(119, 73, 248, 0.7);
     color: #fff;
     border-color: #7749F8;
 }
 
-.form-group .separator {
-    text-align: center;
-    color: #b7c0d8;
-    margin: 15px 0;
-    position: relative;
-}
-
-.form-group .separator:before,
-.form-group .separator:after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    width: 45%;
-    height: 1px;
-    background-color: #384057;
-}
-
-.form-group .separator:before {
-    left: 0;
-}
-
-.form-group .separator:after {
-    right: 0;
-}
-
-/* Preview de imagem */
+/* Melhor espaçamento para a área de preview */
 .image-preview {
-    margin-top: 15px;
-    padding: 10px;
+    margin-top: 20px;
+    padding: 20px;
     border: 1px solid #384057;
-    border-radius: 8px;
+    border-radius: 12px;
     background-color: rgba(42, 50, 78, 0.5);
+    text-align: center;
 }
 
 .image-preview p {
     color: #b7c0d8;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     font-size: 14px;
 }
 
@@ -583,188 +390,112 @@ nav .minha-area-btn,
     height: auto;
     max-height: 200px;
     display: block;
-    border-radius: 5px;
-}
-
-/* Botões de ação */
-.btn {
-    background: linear-gradient(135deg, #7749F8 0%, #6a3ce0 100%);
-    color: #fff;
-    border: none;
-    padding: 14px 20px;
-    border-radius: 12px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-}
-
-.btn:hover {
-    background: linear-gradient(135deg, #6a3ce0 0%, #5c33c8 100%);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(119, 73, 248, 0.3);
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #7749F8 0%, #6a3ce0 100%);
-}
-
-.btn-secondary {
-    background: #384057;
-    margin-left: 10px;
-}
-
-.btn-secondary:hover {
-    background: #455273;
-}
-
-.form-actions {
-    display: flex;
-    justify-content: center;
-    margin-top: 30px;
-}
-
-/* Grid de carros */
-.user-cars {
-    margin-top: 50px;
-}
-
-.user-cars h3 {
-    color: #fff;
-    text-align: center;
-    margin-bottom: 30px;
-    font-size: 24px;
-}
-
-.grid-container {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 25px;
-}
-
-.grid-item {
-    background-color: #1a2135;
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.grid-item:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-}
-
-.grid-item img {
-    width: 100%;
-    height: 180px;
-    object-fit: cover;
-}
-
-.grid-item h4 {
-    color: #fff;
-    padding: 15px 15px 5px;
-    margin: 0;
-    font-size: 18px;
-}
-
-.grid-item p {
-    color: #b7c0d8;
-    padding: 0 15px;
-    margin: 5px 0;
-    font-size: 14px;
-}
-
-.car-actions {
-    display: flex;
-    padding: 15px;
-    gap: 8px;
-}
-
-.action-btn {
-    flex: 1;
-    padding: 8px 0;
-    text-align: center;
     border-radius: 8px;
-    font-size: 13px;
+    margin: 0 auto;
+    border: 1px solid rgba(119, 73, 248, 0.3);
+}
+
+/* Estilo para o preço na nova visualização */
+.car-price {
+    font-size: 20px;
     font-weight: 600;
-    text-decoration: none;
-    transition: all 0.2s ease;
+    color: #7749F8;
+    margin: 10px 0;
 }
 
-.view-btn {
-    background-color: #384057;
-    color: #fff;
+/* Adiciona uma barra de rolagem estilizada para a lista de carros */
+.grid-container::-webkit-scrollbar {
+    width: 8px;
 }
 
-.view-btn:hover {
-    background-color: #455273;
-}
-
-.edit-btn {
-    background-color: #007bff;
-    color: #fff;
-}
-
-.edit-btn:hover {
-    background-color: #0069d9;
-}
-
-.delete-btn {
-    background-color: #dc3545;
-    color: #fff;
-}
-
-.delete-btn:hover {
-    background-color: #c82333;
-}
-
-.no-cars-message {
-    text-align: center;
-    color: #b7c0d8;
-    font-style: italic;
-    padding: 20px;
-    background-color: rgba(42, 50, 78, 0.3);
+.grid-container::-webkit-scrollbar-track {
+    background: rgba(42, 50, 78, 0.3);
     border-radius: 10px;
 }
 
+.grid-container::-webkit-scrollbar-thumb {
+    background: rgba(119, 73, 248, 0.5);
+    border-radius: 10px;
+}
+
+.grid-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(119, 73, 248, 0.7);
+}
+
+/* Esconder campo de upload padrão */
+.form-group .hidden {
+    display: none;
+}
+
 /* Responsividade */
-@media (max-width: 768px) {
-    .card {
-        padding: 25px;
+@media (max-width: 1200px) {
+    .area-protegida-content {
+        flex-direction: column;
+    }
+    
+    .form-column, .cars-column {
+        width: 100%;
     }
     
     .grid-container {
-        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+        max-height: none;
+    }
+}
+
+@media (max-width: 768px) {
+    .grid-item {
+        flex-direction: column;
+    }
+    
+    .grid-item img {
+        width: 100%;
+        height: 200px;
+        border-right: none;
+        border-bottom: 2px solid rgba(119, 73, 248, 0.3);
     }
     
     .form-actions {
         flex-direction: column;
     }
     
-    .btn-secondary {
-        margin-left: 0;
-        margin-top: 10px;
+    .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    
+    .card {
+        padding: 25px 20px;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .grid-item-content {
+        padding: 20px;
+    }
+    @media (max-width: 768px) {
+        .car-actions {
+            flex-direction: row; /* Mantenha os botões na horizontal até onde possível */
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .action-btn {
+            flex: 1;
+            min-width: 70px;
+            font-size: 13px;
+            padding: 8px 12px;
+        }
     }
 }
 
 @media (max-width: 480px) {
-    .card {
-        padding: 20px 15px;
-    }
-    
-    .grid-container {
-        grid-template-columns: 1fr;
-    }
-    
     .car-actions {
         flex-direction: column;
     }
     
-    .action-btn {
-        margin-bottom: 8px;
+    .container {
+        padding: 20px 15px;
     }
 }

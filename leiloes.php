@@ -75,7 +75,7 @@ class LeilaoManager {
         }
         
         $_SESSION['leiloes'][$carro_id] = $leilao;
-
+        
         // Garantir que o preço esteja sincronizado
         $this->sincronizarPrecoLeilaoComCarro($carro_id);
         
@@ -160,37 +160,33 @@ class LeilaoManager {
         // Verificar se o usuário tem saldo suficiente
         $usuario_obj = buscarUsuario($usuario);
         if (!$usuario_obj) {
-            error_log("Usuário não encontrado: $usuario");
             return ['status' => 'erro', 'mensagem' => 'Usuário não encontrado'];
         }
-
-        // Determinar o valor a ser descontado
+        
+        // MODIFICAÇÃO CRÍTICA: Definir o valor correto a ser descontado
         $e_primeiro_lance = count($leilao['lances']) == 0;
-        $valor_a_descontar = $e_primeiro_lance ? floatval($valor) : floatval($incremento);
-
-        // Converter o saldo para um número float para garantir comparação correta
-        $saldo_usuario = floatval($usuario_obj['saldo']);
-
-        // Verificação de saldo mais explícita e com log para depuração
-        error_log("VERIF. SALDO: usuario=$usuario, saldo=$saldo_usuario, valor_lance=$valor_a_descontar, suficiente=" . 
-                ($saldo_usuario >= $valor_a_descontar ? "SIM" : "NÃO"));
-
-        if ($saldo_usuario < $valor_a_descontar) {
-            error_log("LANCE REJEITADO: Saldo insuficiente ($saldo_usuario < $valor_a_descontar)");
-            return [
-                'status' => 'erro', 
-                'mensagem' => 'Saldo insuficiente para realizar este lance. Necessário: R$ ' . 
-                            number_format($valor_a_descontar, 2, ',', '.') . ', Disponível: R$ ' . 
-                            number_format($saldo_usuario, 2, ',', '.')
-            ];
+        $valor_a_descontar = $e_primeiro_lance ? $valor : $incremento;
+        
+        // Adicionar log para depuração
+        error_log("LANCE: usuario=$usuario, valor=$valor, primeiro_lance=" . 
+                  ($e_primeiro_lance ? "SIM" : "NAO") . ", desconto=$valor_a_descontar, saldo=" . 
+                  $usuario_obj['saldo']);
+        
+        // Verificar saldo
+        if ($usuario_obj['saldo'] < $valor_a_descontar) {
+            return ['status' => 'erro', 'mensagem' => 'Saldo insuficiente para realizar este lance. Necessário: R$ ' . 
+                    number_format($valor_a_descontar, 2, ',', '.')];
         }
-
-        // Adicionar uma garantia extra antes de descontar o saldo
+        
+        // Descontar o valor do saldo
         if (!descontarSaldoUsuario($usuario, $valor_a_descontar)) {
-            error_log("FALHA AO DESCONTAR: Não foi possível descontar $valor_a_descontar do saldo de $usuario");
-            return ['status' => 'erro', 'mensagem' => 'Erro ao processar o pagamento do lance. Verifique seu saldo.'];
+            return ['status' => 'erro', 'mensagem' => 'Erro ao processar o pagamento do lance'];
         }
-
+        
+        // Após o desconto, verificar saldo novamente para depuração
+        $usuario_apos = buscarUsuario($usuario);
+        error_log("APÓS DESCONTO: saldo_novo=" . $usuario_apos['saldo'] . 
+                  ", diferença=" . ($usuario_obj['saldo'] - $usuario_apos['saldo']));
         
         // Registrar o lance
         $leilao['lances'][] = [

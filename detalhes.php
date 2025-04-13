@@ -244,41 +244,6 @@ $leilao_finalizado = time() >= $leilao['data_fim'];
                                         </div>
                                     <?php endif; ?>
                                 </div>
-                                
-                                <script>
-                                    document.addEventListener('DOMContentLoaded', function() {
-                                        // Obter elementos do DOM
-                                        const lanceForm = document.querySelector('.bid-form');
-                                        const inputLance = document.querySelector('.bid-input');
-                                        
-                                        if (lanceForm && inputLance) {
-                                            lanceForm.addEventListener('submit', function(e) {
-                                                // Obter valores necessários
-                                                const valorLance = parseFloat(inputLance.value);
-                                                const saldoDisponivel = parseFloat('<?php echo str_replace(',', '.', $saldo); ?>');
-                                                
-                                                if (saldoDisponivel < 1000) { // Valor mínimo presumido para um lance viável
-                                                    e.preventDefault(); // Impedir envio do formulário
-                                                    
-                                                    // Mostrar mensagem de erro simplificada
-                                                    const mensagemErro = document.createElement('div');
-                                                    mensagemErro.className = 'alert alert-danger';
-                                                    mensagemErro.innerHTML = `<strong>Saldo insuficiente!</strong> Você não possui saldo suficiente para este lance.`;
-                                                    
-                                                    // Inserir mensagem antes do formulário
-                                                    lanceForm.parentNode.insertBefore(mensagemErro, lanceForm);
-                                                    
-                                                    // Remover a mensagem após 5 segundos
-                                                    setTimeout(function() {
-                                                        mensagemErro.remove();
-                                                    }, 5000);
-                                                    
-                                                    return false;
-                                                }
-                                            });
-                                        }
-                                    });
-                                </script>
                             <?php else: ?>
                                 <div class="alert alert-warning">Você não pode dar lance em seu próprio carro!</div>
                             <?php endif; ?>

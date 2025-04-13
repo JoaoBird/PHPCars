@@ -50,6 +50,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $categoria = isset($_POST['categoria']) ? trim($_POST['categoria']) : '';
     $preco = isset($_POST['preco']) ? floatval($_POST['preco']) : 0;
     $id = isset($_POST['id']) ? intval($_POST['id']) : 0;
+
+
+    // Novos campos
+    $quilometragem = isset($_POST['quilometragem']) ? intval($_POST['quilometragem']) : 0;
+    $motor = isset($_POST['motor']) ? trim($_POST['motor']) : '';
+    $cambio = isset($_POST['cambio']) ? trim($_POST['cambio']) : '';
+    $combustivel = isset($_POST['combustivel']) ? trim($_POST['combustivel']) : '';
     
     // Inicializar imagem com valor padrão ou existente
     $imagem = 'img/carros/default.jpg';
@@ -92,7 +99,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'ano' => $ano,
             'categoria' => $categoria,
             'preco' => $preco,
-            'imagem' => $imagem
+            'imagem' => $imagem,
+            // Novos campos
+            'quilometragem' => $quilometragem,
+            'motor' => $motor,
+            'cambio' => $cambio,
+            'combustivel' => $combustivel
         ];
         
         if ($id > 0) {
@@ -179,7 +191,40 @@ include_once 'header.php';
                         <label for="ano">Ano:</label>
                         <input type="text" id="ano" name="ano" required value="<?php echo $modo === 'edicao' && $carro_editando ? htmlspecialchars($carro_editando['ano']) : ''; ?>">
                     </div>
-                    
+                    <div class="form-group">
+                        <label for="quilometragem">Quilometragem (km):</label>
+                        <input type="number" id="quilometragem" name="quilometragem" min="0" required value="<?php echo $modo === 'edicao' && $carro_editando ? htmlspecialchars($carro_editando['quilometragem']) : ''; ?>">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="motor">Motor:</label>
+                        <input type="text" id="motor" name="motor" required value="<?php echo $modo === 'edicao' && $carro_editando ? htmlspecialchars($carro_editando['motor']) : ''; ?>">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="cambio">Câmbio:</label>
+                        <select id="cambio" name="cambio" required>
+                            <option value="">Selecione o câmbio</option>
+                            <option value="Manual" <?php echo ($modo === 'edicao' && $carro_editando && $carro_editando['cambio'] === 'Manual') ? 'selected' : ''; ?>>Manual</option>
+                            <option value="Automático" <?php echo ($modo === 'edicao' && $carro_editando && $carro_editando['cambio'] === 'Automático') ? 'selected' : ''; ?>>Automático</option>
+                            <option value="Semi-automático" <?php echo ($modo === 'edicao' && $carro_editando && $carro_editando['cambio'] === 'Semi-automático') ? 'selected' : ''; ?>>Semi-automático</option>
+                            <option value="CVT" <?php echo ($modo === 'edicao' && $carro_editando && $carro_editando['cambio'] === 'CVT') ? 'selected' : ''; ?>>CVT</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="combustivel">Combustível:</label>
+                        <select id="combustivel" name="combustivel" required>
+                            <option value="">Selecione o combustível</option>
+                            <option value="Gasolina" <?php echo ($modo === 'edicao' && $carro_editando && $carro_editando['combustivel'] === 'Gasolina') ? 'selected' : ''; ?>>Gasolina</option>
+                            <option value="Álcool" <?php echo ($modo === 'edicao' && $carro_editando && $carro_editando['combustivel'] === 'Álcool') ? 'selected' : ''; ?>>Álcool</option>
+                            <option value="Flex" <?php echo ($modo === 'edicao' && $carro_editando && $carro_editando['combustivel'] === 'Flex') ? 'selected' : ''; ?>>Flex</option>
+                            <option value="Diesel" <?php echo ($modo === 'edicao' && $carro_editando && $carro_editando['combustivel'] === 'Diesel') ? 'selected' : ''; ?>>Diesel</option>
+                            <option value="GNV" <?php echo ($modo === 'edicao' && $carro_editando && $carro_editando['combustivel'] === 'GNV') ? 'selected' : ''; ?>>GNV</option>
+                            <option value="Elétrico" <?php echo ($modo === 'edicao' && $carro_editando && $carro_editando['combustivel'] === 'Elétrico') ? 'selected' : ''; ?>>Elétrico</option>
+                            <option value="Híbrido" <?php echo ($modo === 'edicao' && $carro_editando && $carro_editando['combustivel'] === 'Híbrido') ? 'selected' : ''; ?>>Híbrido</option>
+                        </select>
+                    </div>
                     <div class="form-group">
                         <label for="categoria">Categoria:</label>
                         <select id="categoria" name="categoria" required>

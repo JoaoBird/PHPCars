@@ -9,6 +9,7 @@ $categorias = [
 ];
 
 // Definir os carros
+// Definir os carros
 $carros = [
     [
         'id' => 1,
@@ -18,7 +19,11 @@ $carros = [
         'modelo' => "Fusca",
         'categoria' => "Lata velha",
         'preco' => 15000.00,
-        'imagem' => "img/carros/fusca.jpg"
+        'imagem' => "img/carros/fusca.jpg",
+        'quilometragem' => 85000,
+        'motor' => "1.6",
+        'cambio' => "Manual",
+        'combustivel' => "Gasolina"
     ],
     [
         'id' => 2,
@@ -28,7 +33,11 @@ $carros = [
         'modelo' => "Chevette",
         'categoria' => "Tração traseira",
         'preco' => 8000.00,
-        'imagem' => "img/carros/chevette.jpg"
+        'imagem' => "img/carros/chevette.jpg",
+        'quilometragem' => 120000,
+        'motor' => "1.4",
+        'cambio' => "Manual",
+        'combustivel' => "Álcool"
     ],
     [
         'id' => 3,
@@ -38,7 +47,11 @@ $carros = [
         'modelo' => "Mustang",
         'categoria' => "Clássico",
         'preco' => 120000.00,
-        'imagem' => "img/carros/mustang.jpg"
+        'imagem' => "img/carros/mustang.jpg",
+        'quilometragem' => 65000,
+        'motor' => "5.0",
+        'cambio' => "Manual",
+        'combustivel' => "Gasolina"
     ],
     [
         'id' => 4,
@@ -48,7 +61,11 @@ $carros = [
         'modelo' => "Uno",
         'categoria' => "Popular",
         'preco' => 6500.00,
-        'imagem' => "img/carros/uno.jpg"
+        'imagem' => "img/carros/uno.jpg",
+        'quilometragem' => 180000,
+        'motor' => "1.0",
+        'cambio' => "Manual",
+        'combustivel' => "Gasolina"
     ],
     [
         'id' => 5,
@@ -58,7 +75,11 @@ $carros = [
         'modelo' => "Charger",
         'categoria' => "Muscle car",
         'preco' => 180000.00,
-        'imagem' => "img/carros/charger.jpg"
+        'imagem' => "img/carros/charger.jpg",
+        'quilometragem' => 75000,
+        'motor' => "7.2",
+        'cambio' => "Manual",
+        'combustivel' => "Gasolina"
     ]
 ];
 

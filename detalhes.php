@@ -149,22 +149,22 @@ $imagens_galeria = $imagens;
                 <div class="specs-grid">
                     <div class="spec-item">
                         <span class="spec-label">Motor</span>
-                        <span class="spec-value"><?php echo isset($carro['motor']) ? htmlspecialchars($carro['motor']) : '1.6'; ?></span>
-                    </div>
+                        <span class="detail-value"><?php echo htmlspecialchars($carro['motor']); ?></span>
+                        </div>
                     <div class="spec-item">
                         <span class="spec-label">Quilometragem</span>
-                        <span class="spec-value"><?php echo isset($carro['km']) ? htmlspecialchars($carro['km']) : '85.000 km'; ?></span>
-                    </div>
+                        <span class="detail-value"><?php echo number_format($carro['quilometragem'], 0, ',', '.'); ?> km</span>
+                        </div>
                     <div class="spec-item">
                         <span class="spec-label">Câmbio</span>
-                        <span class="spec-value"><?php echo isset($carro['cambio']) ? htmlspecialchars($carro['cambio']) : 'Manual'; ?></span>
-                    </div>
+                        <span class="detail-value"><?php echo htmlspecialchars($carro['cambio']); ?></span>
+                        </div>
                     <div class="spec-item">
                         <span class="spec-label">Combustível</span>
-                        <span class="spec-value"><?php echo isset($carro['combustivel']) ? htmlspecialchars($carro['combustivel']) : 'Gasolina'; ?></span>
-                    </div>
+                        <span class="detail-value"><?php echo htmlspecialchars($carro['combustivel']); ?></span>
+                        </div>
                 </div>
-            </div>
+  </div>
             
             <div class="info-column">
                 <!-- Lances Atuais -->

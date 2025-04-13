@@ -36,16 +36,16 @@ $e_pagina_protegido = ($pagina_atual == 'protegido.php');
         <img id="profile-pic" src="img/avatar-user.png" alt="Avatar do Usuário" />
         <span id="user-name"><?php echo htmlspecialchars($_SESSION['username']); ?></span>
         <span id="user-saldo">Saldo: R$<?php echo number_format($_SESSION['saldo'], 2, ',', '.'); ?></span>
-        <?php if(!$e_pagina_protegido): ?>
-        <a href="protegido.php" class="btn">Minha Área</a>
+          <?php if(!$e_pagina_protegido): ?>
+          <button type="button" class="btn" onclick="window.location.href='protegido.php'">Minha Área</button>
         <?php endif; ?>
-        <a href="logout.php" class="logout-btn">Sair</a>
-      <?php else: ?>
-        <span id="user-name">Visitante</span>
-        <?php if(!$e_pagina_login): ?>
-        <a href="login.php" class="login-btn">Entrar</a>
+        <button type="button" class="logout-btn" onclick="window.location.href='logout.php'">Sair</button>
+        <?php else: ?>
+          <span id="user-name">Visitante</span>
+          <?php if(!$e_pagina_login): ?>
+            <button type="button" class="login-btn" onclick="window.location.href='login.php'">Entrar</button>
+          <?php endif; ?>
         <?php endif; ?>
-      <?php endif; ?>
     </div>
 
   </header>

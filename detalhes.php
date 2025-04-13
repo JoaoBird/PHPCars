@@ -2,7 +2,9 @@
 session_start();
 include_once 'dados.php';
 include_once 'funcoes.php';
-
+include_once 'leiloes.php'; // Incluir o novo arquivo de leilões
+include_once 'usuarios.php';
+include_once 'login_fix.php';
 
 // Obter ID do carro
 $id = isset($_GET['id']) ? intval($_GET['id']) : 0;
@@ -13,29 +15,65 @@ if ($id <= 0) {
     exit;
 }
 
-// Buscar carro diretamente usando a função de busca unificada
+// Buscar o carro pelo ID
 $carro = buscarCarro($id);
 
 // Se carro não for encontrado, redirecionar para a página inicial
-if (!$carro) {
-    // Para debug - remova após testar
-    echo "Carro não encontrado: ID = $id<br>";
-    echo "Dados disponíveis: <pre>";
-    print_r(carregarCarros());
-    echo "</pre>";
+if (!$carro || !is_array($carro)) {
+    header('Location: index.php');
     exit;
-    
-    // Descomente após testar
-     header('Location: index.php');
-     exit;
 }
 
-// Verificar se o usuário pode dar lance
+// Agora que temos o carro, obter informações do leilão
+global $leilaoManager;
+$leilao = $leilaoManager->obterLeilao($id);
+
+// Verificar se o usuário está logado
+$logado = usuarioLogado();
+$usuario_nome = $logado ? $_SESSION['username'] : "Não logado";
+
+// Agora que temos o carro, verificar se o usuário pode dar lance
+$pode_dar_lance = podeDarLance($id, $carro);
+if ($logado) {
+    $usuario_obj = buscarUsuario($_SESSION['username']);
+    $saldo = $usuario_obj ? number_format($usuario_obj['saldo'], 2, ',', '.') : "N/A";
+    
+    // Garantir que usuario_id também esteja definido, se necessário
+    if (!isset($_SESSION['usuario_id']) && isset($usuario_obj['id'])) {
+        $_SESSION['usuario_id'] = $usuario_obj['id'];
+    }
+} else {
+    $saldo = "N/A";
+}
+
+// Verificar se o usuário pode dar lance (usando a função do login_fix.php)
 $pode_dar_lance = podeDarLance($id);
+
+// Corrigir a verificação de se o usuário pode dar lance agora
+$usuario_logado = usuarioLogado() ? $_SESSION['username'] : null;
+$pode_dar_lance_agora = $usuario_logado && $leilaoManager->podeUsuarioDarLance($usuario_logado);
+
+// Se carro não for encontrado, redirecionar para a página inicial
+if (!$carro || !is_array($carro)) {
+    header('Location: index.php');
+    exit;
+}
+
+// Processar um lance se enviado
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['valor']) && $usuario_logado) {
+    $valor_lance = floatval(str_replace(',', '.', $_POST['valor']));
+    $resultado = $leilaoManager->registrarLance($id, $usuario_logado, $valor_lance);
+    
+    // Armazenar o resultado para exibir mensagem ao usuário
+    $_SESSION['mensagem_lance'] = $resultado;
+    
+    // Redirecionar para evitar reenvio do formulário
+    header('Location: detalhes.php?id=' . $id);
+    exit;
+}
 
 // Incluir o header antes de qualquer saída HTML
 include_once 'header.php';
-
 
 // Preparar as imagens para exibição
 $imagens = [];
@@ -55,6 +93,15 @@ $imagem_principal = !empty($imagens) ? $imagens[0] : 'img/carros/default.jpg';
 
 // Preparar todas as imagens para a galeria
 $imagens_galeria = $imagens;
+
+if (!$leilao || !is_array($leilao)) {
+    // Criar um leilão padrão ou redirecionar
+    header('Location: index.php');
+    exit;
+}
+
+$tempo_restante = $leilaoManager->formatarTempoRestante($leilao['data_fim']);
+$leilao_finalizado = time() >= $leilao['data_fim'];
 ?>
 
 <link rel="stylesheet" href="css/detalhes.css">
@@ -102,26 +149,70 @@ $imagens_galeria = $imagens;
             <div class="info-column">
                 <!-- Preço e Botões de Ação -->
                 <div class="price-section">
-                    <h2 class="car-price">R$ <?php echo number_format($carro['preco'], 2, ',', '.'); ?></h2>
+                
+                <h2 class="car-price">R$ <?php echo number_format(isset($leilao['preco_atual']) ? $leilao['preco_atual'] : 0, 2, ',', '.'); ?></h2>                    
+                    <?php if (isset($_SESSION['mensagem_lance'])): ?>
+                        <div class="alert <?php echo $_SESSION['mensagem_lance']['status'] === 'sucesso' ? 'alert-success' : 'alert-warning'; ?>">
+                            <?php echo $_SESSION['mensagem_lance']['mensagem']; ?>
+                        </div>
+                        <?php unset($_SESSION['mensagem_lance']); ?>
+                    <?php endif; ?>
                     
-                    <?php if (usuarioLogado()): ?>
-                        <?php if ($pode_dar_lance): ?>
-                            <!-- Interface de lances -->
-                            <div class="bid-section">
-                                <form action="#" method="post" class="bid-form">
-                                    <input type="hidden" name="carro_id" value="<?php echo $id; ?>">
-                                    <input type="number" name="valor" class="bid-input" 
-                                           placeholder="Digite seu lance (R$)" min="<?php echo $carro['preco']; ?>" step="100">
-                                    <button type="submit" class="bid-button">Fazer Lance</button>
-                                </form>
+                    <!-- Contador de tempo -->
+                    <div class="time-remaining" style="margin-bottom: 15px;">
+                        <span style="display: block; font-size: 14px; color: #a0aec0;">Tempo restante:</span>
+                        <span style="font-weight: bold; font-size: 18px; <?php echo $leilao_finalizado ? 'color: #e74c3c;' : 'color: #2ecc71;'; ?>">
+                            <?php echo $tempo_restante; ?>
+                        </span>
+                    </div>
+                    
+                    <?php if ($leilao_finalizado): ?>
+                        <?php if ($leilao['vencedor']): ?>
+                            <div class="alert alert-success" style="text-align: center; background-color: rgba(46, 204, 113, 0.2); border-left: 4px solid #2ecc71; color: #2ecc71;">
+                                <strong>Leilão encerrado!</strong><br>
+                                Vencedor: <strong><?php echo htmlspecialchars($leilao['vencedor']); ?></strong> com o lance de 
+                                R$ <?php echo number_format(end($leilao['lances'])['valor'], 2, ',', '.'); ?>
                             </div>
                         <?php else: ?>
-                            <div class="alert alert-warning">Você não pode dar lance em seu próprio carro!</div>
+                            <div class="alert alert-warning" style="text-align: center;">
+                                <strong>Leilão encerrado sem lances!</strong>
+                            </div>
                         <?php endif; ?>
                     <?php else: ?>
-                        <div class="login-prompt">
-                            <a href="login.php" class="login-btn">Faça login para dar lances</a>
-                        </div>
+                        <?php if (usuarioLogado()): ?>
+                            <?php if ($pode_dar_lance): ?>
+                                <!-- Interface de lances -->
+                                <div class="bid-section">
+                                    <form action="detalhes.php?id=<?php echo $id; ?>" method="post" class="bid-form">
+                                        <input type="hidden" name="carro_id" value="<?php echo $id; ?>">
+                                        <input type="number" name="valor" class="bid-input" 
+                                               placeholder="Digite seu lance (R$)" 
+                                               min="<?php echo $leilao['preco_atual'] + $leilao['incremento_minimo']; ?>" 
+                                               step="100"
+                                               <?php echo $pode_dar_lance_agora ? '' : 'disabled'; ?>>
+                                        <button type="submit" class="bid-button" <?php echo $pode_dar_lance_agora ? '' : 'disabled'; ?>>
+                                            Fazer Lance
+                                        </button>
+                                    </form>
+                                    
+                                    <?php if (!$pode_dar_lance_agora): ?>
+                                        <div class="alert alert-warning" style="margin-top: 10px;">
+                                            Você precisa esperar um pouco antes de dar outro lance
+                                        </div>
+                                    <?php else: ?>
+                                        <div style="margin-top: 8px; font-size: 13px; color: #a0aec0;">
+                                            * Lance mínimo: R$ <?php echo number_format($leilao['preco_atual'] + $leilao['incremento_minimo'], 2, ',', '.'); ?>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            <?php else: ?>
+                                <div class="alert alert-warning">Você não pode dar lance em seu próprio carro!</div>
+                            <?php endif; ?>
+                        <?php else: ?>
+                            <div class="login-prompt">
+                                <a href="login.php" class="login-btn">Faça login para dar lances</a>
+                            </div>
+                        <?php endif; ?>
                     <?php endif; ?>
                 </div>
 
@@ -150,41 +241,63 @@ $imagens_galeria = $imagens;
                     <div class="spec-item">
                         <span class="spec-label">Motor</span>
                         <span class="detail-value"><?php echo htmlspecialchars($carro['motor']); ?></span>
-                        </div>
+                    </div>
                     <div class="spec-item">
                         <span class="spec-label">Quilometragem</span>
                         <span class="detail-value"><?php echo number_format($carro['quilometragem'], 0, ',', '.'); ?> km</span>
-                        </div>
+                    </div>
                     <div class="spec-item">
                         <span class="spec-label">Câmbio</span>
                         <span class="detail-value"><?php echo htmlspecialchars($carro['cambio']); ?></span>
-                        </div>
+                    </div>
                     <div class="spec-item">
                         <span class="spec-label">Combustível</span>
                         <span class="detail-value"><?php echo htmlspecialchars($carro['combustivel']); ?></span>
-                        </div>
+                    </div>
                 </div>
-  </div>
+            </div>
             
             <div class="info-column">
                 <!-- Lances Atuais -->
-                <?php if (usuarioLogado()): ?>
                 <div class="current-bids">
                     <h3>Lances Atuais</h3>
-                    <div class="bid-list">
-                        <div class="bid-item">
-                            <span class="bid-user">usuario123</span>
-                            <span class="bid-amount">R$ <?php echo number_format($carro['preco'] - 500, 2, ',', '.'); ?></span>
-                            <span class="bid-time">há 2 horas</span>
+                    <?php if (empty($leilao['lances'])): ?>
+                        <div style="text-align: center; padding: 15px; color: #a0aec0;">
+                            Nenhum lance registrado até o momento.
                         </div>
-                        <div class="bid-item">
-                            <span class="bid-user">colecionador</span>
-                            <span class="bid-amount">R$ <?php echo number_format($carro['preco'] - 1000, 2, ',', '.'); ?></span>
-                            <span class="bid-time">há 4 horas</span>
+                    <?php else: ?>
+                        <div class="bid-list">
+                            <?php 
+                            // Verificar se lances está definido e é um array
+                            $lances = isset($leilao['lances']) && is_array($leilao['lances']) ? $leilao['lances'] : [];
+                            
+                            // Se tiver lances, ordená-los e exibi-los
+                            if (!empty($lances)) {
+                                // Ordenar lances do mais recente para o mais antigo
+                                usort($lances, function($a, $b) {
+                                    return $b['data'] - $a['data'];
+                                });
+                                
+                                // Exibir os últimos 5 lances
+                                $lances = array_slice($lances, 0, 5);
+                                
+                                // Exibir cada lance
+                                foreach ($lances as $lance) {
+                                    ?>
+                                    <div class="bid-item <?php echo (isset($lance['usuario_real']) && $lance['usuario_real']) ? 'bid-real-user' : ''; ?>">
+                                        <div>
+                                            <span class="bid-user"><?php echo htmlspecialchars($lance['usuario']); ?></span>
+                                            <span class="bid-time"><?php echo formatarTempoDecorrido($lance['data']); ?></span>
+                                        </div>
+                                        <span class="bid-amount">R$ <?php echo number_format($lance['valor'], 2, ',', '.'); ?></span>
+                                    </div>
+                                    <?php
+                                }
+                            }
+                            ?>
                         </div>
-                    </div>
+                    <?php endif; ?>
                 </div>
-                <?php endif; ?>
                 
                 <!-- Descrição -->
                 <?php if (isset($carro['descricao']) && !empty($carro['descricao'])): ?>
@@ -194,13 +307,16 @@ $imagens_galeria = $imagens;
                         <?php echo nl2br(htmlspecialchars($carro['descricao'])); ?>
                     </div>
                 </div>
+                <?php else: ?>
+                    <div class="car-description">
+                    <h3>Descrição</h3>
+                    <div class="description-content">
+                        <p>Este <?php echo htmlspecialchars($carro['marca'] . ' ' . $carro['modelo']); ?> <?php echo htmlspecialchars($carro['ano']); ?> 
+                        está em excelente estado de conservação, com documentação em dia e pronto para transferência.</p>
+                    </div>
+                </div>
                 <?php endif; ?>
             </div>
-        </div>
-        
-        <!-- Botão de Voltar -->
-        <div class="back-button-container">
-            <a href="index.php" class="back-button">Voltar para Listagem</a>
         </div>
     </div>
 </div>

@@ -499,3 +499,22 @@ body {
         padding: 20px 15px;
     }
 }
+
+.area-protegida-titulo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.saldo-info {
+    margin: 0;
+    font-weight: bold;
+    color: #28a745;
+}

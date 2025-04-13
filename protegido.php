@@ -2,6 +2,7 @@
 session_start();
 include_once 'dados.php';
 include_once 'funcoes.php';
+include_once 'usuarios.php';
 
 // Verificar se o usuário está logado
 verificarLogin();
@@ -155,7 +156,15 @@ include_once 'header.php';
 <link rel="stylesheet" href="./css/Protegido.css">
 <div class="container area-protegida">
     <h2 class="area-protegida-titulo">Área Protegida - Bem-vindo, <?php echo htmlspecialchars($_SESSION['username']); ?>!</h2>
-    
+    <div class="user-info">
+    <?php 
+        $usuario_atual = buscarUsuario($_SESSION['username']);
+        $saldo_atual = isset($_SESSION['saldo']) ? $_SESSION['saldo'] : 0;
+
+    ?>
+    <p class="saldo-info">Seu saldo: R$ <?php echo number_format($saldo_atual, 2, ',', '.'); ?></p>
+    <a href="adicionar_saldo.php" class="btn btn-sm btn-success">Adicionar Saldo</a>
+</div>
     <!-- Novo layout de duas colunas -->
     <div class="area-protegida-content">
         <!-- Coluna esquerda - Formulário -->

@@ -4,7 +4,7 @@ define('ARQUIVO_CARROS', 'dados/carros.json');
 
 //Verifica se o usuário está logado (necessita do session_start())
 function usuarioLogado(){
-    return isset($_SESSION['usuario_logado']) && ($_SESSION['usuario_logado'] === true);
+    return isset($_SESSION['username']) && !empty($_SESSION['username']);
 }
 
 //Verifica o login e joga o usuário para uma página específica
@@ -35,6 +35,25 @@ function carregarCarros() {
     }
     
     return json_decode($conteudo, true);
+}
+
+
+function formatarTempoDecorrido($timestamp) {
+    $agora = time();
+    $diferenca = $agora - $timestamp;
+    
+    if ($diferenca < 60) {
+        return "agora mesmo";
+    } elseif ($diferenca < 3600) {
+        $minutos = floor($diferenca / 60);
+        return "há " . $minutos . ($minutos == 1 ? " minuto" : " minutos");
+    } elseif ($diferenca < 86400) {
+        $horas = floor($diferenca / 3600);
+        return "há " . $horas . ($horas == 1 ? " hora" : " horas");
+    } else {
+        $dias = floor($diferenca / 86400);
+        return "há " . $dias . ($dias == 1 ? " dia" : " dias");
+    }
 }
 
 // Função para salvar carros no arquivo

@@ -438,3 +438,23 @@ body {
     border-left: 4px solid #f39c12;
     color: #f39c12;
 }
+
+.description-content {
+    line-height: 1.8; /* Aumentar o espaçamento entre linhas */
+    color: #cbd5e0;
+    word-spacing: 2px; /* Adicionar espaçamento entre palavras */
+    white-space: normal; /* Garantir quebras normais de linha */
+}
+
+.description-content p {
+    margin-bottom: 15px; /* Adicionar espaço entre parágrafos */
+}
+
+.description-content ul {
+    margin-left: 20px; /* Indentar a lista */
+    margin-bottom: 15px; /* Espaço após a lista */
+}
+
+.description-content li {
+    margin-bottom: 8px; /* Espaço entre itens da lista */
+}

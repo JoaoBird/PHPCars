@@ -24,6 +24,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['username'] = $username;
         $_SESSION['saldo'] = $usuario['saldo'];
         $_SESSION['user_id'] = md5($username); 
+        $_SESSION['saldo'] = $usuario['saldo'];
+        // No script de processamento de login, deve haver algo como:
+            $_SESSION['usuario_id'] = $usuario['id'];
+            $_SESSION['usuario'] = $usuario['usuario'];
         
         header('Location: index.php');
         exit;

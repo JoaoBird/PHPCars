@@ -3,6 +3,10 @@
 include_once 'dados.php'; 
 include_once 'funcoes.php';
 include_once 'filtrar.php';
+include_once 'leiloes.php';
+
+// Torna o leilaoManager acessível neste arquivo
+global $leilaoManager;
 
 // Iniciar a sessão se ainda não foi iniciada
 if (session_status() == PHP_SESSION_NONE) {
@@ -35,6 +39,17 @@ if (isset($_GET['limpar_filtros'])) {
 
 // Carregar todos os carros primeiro
 $carros_persistentes = carregarCarros();
+
+// Sincronizar preços para todos os carros que têm leilões ativos
+if (isset($_SESSION['leiloes']) && is_array($_SESSION['leiloes'])) {
+    foreach ($_SESSION['leiloes'] as $carro_id => $leilao) {
+        $leilaoManager->sincronizarPrecoLeilaoComCarro($carro_id);
+    }
+}
+
+// Recarregar os carros após a sincronização
+$carros_persistentes = carregarCarros();
+$todos_carros = isset($carros) && is_array($carros) ? array_merge($carros, $carros_persistentes) : $carros_persistentes;
 
 // Combinar com carros pré-definidos (se existirem)
 $todos_carros = isset($carros) && is_array($carros) ? array_merge($carros, $carros_persistentes) : $carros_persistentes;

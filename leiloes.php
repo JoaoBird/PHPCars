@@ -25,60 +25,62 @@ class LeilaoManager {
     }
     
     // Criar um novo leilão
-// Criar um novo leilão
-private function criarNovoLeilao($carro_id) {
-    global $carros;
-    
-    // Encontrar o carro
-    $carro = null;
-    foreach ($carros as $c) {
-        if ($c['id'] == $carro_id) {
-            $carro = $c;
-            break;
+    private function criarNovoLeilao($carro_id) {
+        global $carros;
+        
+        // Encontrar o carro
+        $carro = null;
+        foreach ($carros as $c) {
+            if ($c['id'] == $carro_id) {
+                $carro = $c;
+                break;
+            }
         }
-    }
-    
-    if (!$carro) {
-        // Retornar um array vazio ou estrutura básica em vez de false
-        return [
+        
+        if (!$carro) {
+            // Retornar um array vazio ou estrutura básica em vez de false
+            return [
+                'carro_id' => $carro_id,
+                'preco_inicial' => 0,
+                'preco_atual' => 0,
+                'incremento_minimo' => 100,
+                'data_inicio' => time(),
+                'data_fim' => time() + (72 * 60 * 60),
+                'lances' => [],
+                'vencedor' => null
+            ];
+        }
+        
+        // Definir prazo de 72 horas (em segundos)
+        $prazo_segundos = 72 * 60 * 60;
+        
+        // Criar leilão
+        $leilao = [
             'carro_id' => $carro_id,
-            'preco_inicial' => 0,
-            'preco_atual' => 0,
-            'incremento_minimo' => 100,
+            'preco_inicial' => $carro['preco'],
+            'preco_atual' => $carro['preco'],
+            'incremento_minimo' => $this->calcularIncrementoMinimo($carro['preco']),
             'data_inicio' => time(),
-            'data_fim' => time() + (72 * 60 * 60),
+            'data_fim' => time() + $prazo_segundos,
             'lances' => [],
             'vencedor' => null
         ];
+        
+        // Gerar alguns lances aleatórios iniciais para movimentar o leilão
+        $this->gerarLancesIniciais($leilao);
+        
+        // Salvar na sessão
+        if (!isset($_SESSION['leiloes'])) {
+            $_SESSION['leiloes'] = [];
+        }
+        
+        $_SESSION['leiloes'][$carro_id] = $leilao;
+        
+        // Garantir que o preço esteja sincronizado
+        $this->sincronizarPrecoLeilaoComCarro($carro_id);
+        
+        return $leilao;
     }
-    
-    // Definir prazo de 72 horas (em segundos)
-    $prazo_segundos = 72 * 60 * 60;
-    
-    // Criar leilão
-    $leilao = [
-        'carro_id' => $carro_id,
-        'preco_inicial' => $carro['preco'],
-        'preco_atual' => $carro['preco'],
-        'incremento_minimo' => $this->calcularIncrementoMinimo($carro['preco']),
-        'data_inicio' => time(),
-        'data_fim' => time() + $prazo_segundos,
-        'lances' => [],
-        'vencedor' => null
-    ];
-    
-    // Gerar alguns lances aleatórios iniciais para movimentar o leilão
-    $this->gerarLancesIniciais($leilao);
-    
-    // Salvar na sessão
-    if (!isset($_SESSION['leiloes'])) {
-        $_SESSION['leiloes'] = [];
-    }
-    
-    $_SESSION['leiloes'][$carro_id] = $leilao;
-    
-    return $leilao;
-}
     
     // Calcular incremento mínimo baseado no preço (regra de negócio)
     private function calcularIncrementoMinimo($preco) {
@@ -133,65 +135,94 @@ private function criarNovoLeilao($carro_id) {
     }
     
     // Registrar um novo lance
-
-        public function registrarLance($carro_id, $usuario, $valor) {
-            // Obter leilão
-            $leilao = $this->obterLeilao($carro_id);
-            
-            // Validações básicas
-            if (!$leilao) {
-                return ['status' => 'erro', 'mensagem' => 'Leilão não encontrado'];
-            }
-            
-            if (time() > $leilao['data_fim']) {
-                return ['status' => 'erro', 'mensagem' => 'Este leilão já foi encerrado'];
-            }
-            
-            if ($valor <= $leilao['preco_atual']) {
-                return ['status' => 'erro', 'mensagem' => 'O lance deve ser maior que o lance atual (R$ ' . number_format($leilao['preco_atual'], 2, ',', '.') . ')'];
-            }
-            
-            $incremento = $valor - $leilao['preco_atual'];
-            if ($incremento < $leilao['incremento_minimo']) {
-                return ['status' => 'erro', 'mensagem' => 'O incremento mínimo é de R$ ' . number_format($leilao['incremento_minimo'], 2, ',', '.') . ''];
-            }
-            
-            // Verificar se o usuário tem saldo suficiente
-            $usuario_obj = buscarUsuario($usuario);
-            $incremento = $valor - $leilao['preco_atual'];
-
-            // Depuração temporária
-            error_log("Debug: Usuário: {$usuario}, Saldo: {$usuario_obj['saldo']}, Incremento necessário: {$incremento}");
-
-            if (!$usuario_obj || $usuario_obj['saldo'] < $incremento) {
-                return ['status' => 'erro', 'mensagem' => 'Saldo insuficiente para realizar este lance'];
-            }
-                                    
-            // Registrar o lance
-            $leilao['lances'][] = [
-                'usuario' => $usuario,
-                'valor' => $valor,
-                'data' => time(),
-                'usuario_real' => true // Marcador para identificar que é um usuário real
-            ];
-            
-            // Atualizar preço atual
-            $leilao['preco_atual'] = $valor;
-            
-            // Atualizar no registro de leilões
-            $_SESSION['leiloes'][$carro_id] = $leilao;
-            
-            // Registrar timestamp do último lance do usuário
-            if (!isset($_SESSION['ultimo_lance'])) {
-                $_SESSION['ultimo_lance'] = [];
-            }
-            $_SESSION['ultimo_lance'][$usuario] = time();
-            
-            // Agendar lances automáticos futuros
-            $this->agendarLanceFuturo($carro_id);
-            
-            return ['status' => 'sucesso', 'mensagem' => 'Lance registrado com sucesso!'];
+    public function registrarLance($carro_id, $usuario, $valor) {
+        // Obter leilão
+        $leilao = $this->obterLeilao($carro_id);
+        
+        // Validações básicas
+        if (!$leilao) {
+            return ['status' => 'erro', 'mensagem' => 'Leilão não encontrado'];
         }
+        
+        if (time() > $leilao['data_fim']) {
+            return ['status' => 'erro', 'mensagem' => 'Este leilão já foi encerrado'];
+        }
+        
+        if ($valor <= $leilao['preco_atual']) {
+            return ['status' => 'erro', 'mensagem' => 'O lance deve ser maior que o lance atual (R$ ' . number_format($leilao['preco_atual'], 2, ',', '.') . ')'];
+        }
+        
+        $incremento = $valor - $leilao['preco_atual'];
+        if ($incremento < $leilao['incremento_minimo']) {
+            return ['status' => 'erro', 'mensagem' => 'O incremento mínimo é de R$ ' . number_format($leilao['incremento_minimo'], 2, ',', '.') . ''];
+        }
+        
+        // Verificar se o usuário tem saldo suficiente
+        $usuario_obj = buscarUsuario($usuario);
+        if (!$usuario_obj) {
+            return ['status' => 'erro', 'mensagem' => 'Usuário não encontrado'];
+        }
+        
+        // MODIFICAÇÃO CRÍTICA: Definir o valor correto a ser descontado
+        $e_primeiro_lance = count($leilao['lances']) == 0;
+        $valor_a_descontar = $e_primeiro_lance ? $valor : $incremento;
+        
+        // Adicionar log para depuração
+        error_log("LANCE: usuario=$usuario, valor=$valor, primeiro_lance=" . 
+                  ($e_primeiro_lance ? "SIM" : "NAO") . ", desconto=$valor_a_descontar, saldo=" . 
+                  $usuario_obj['saldo']);
+        
+        // Verificar saldo
+        if ($usuario_obj['saldo'] < $valor_a_descontar) {
+            return ['status' => 'erro', 'mensagem' => 'Saldo insuficiente para realizar este lance. Necessário: R$ ' . 
+                    number_format($valor_a_descontar, 2, ',', '.')];
+        }
+        
+        // Descontar o valor do saldo
+        if (!descontarSaldoUsuario($usuario, $valor_a_descontar)) {
+            return ['status' => 'erro', 'mensagem' => 'Erro ao processar o pagamento do lance'];
+        }
+        
+        // Após o desconto, verificar saldo novamente para depuração
+        $usuario_apos = buscarUsuario($usuario);
+        error_log("APÓS DESCONTO: saldo_novo=" . $usuario_apos['saldo'] . 
+                  ", diferença=" . ($usuario_obj['saldo'] - $usuario_apos['saldo']));
+        
+        // Registrar o lance
+        $leilao['lances'][] = [
+            'usuario' => $usuario,
+            'valor' => $valor,
+            'data' => time(),
+            'usuario_real' => true,
+            'valor_descontado' => $valor_a_descontar, // Registrar quanto foi descontado
+            'primeiro_lance' => $e_primeiro_lance     // Registrar se foi primeiro lance
+        ];
+        
+        // Atualizar preço atual
+        $leilao['preco_atual'] = $valor;
+        
+        // Atualizar no registro de leilões
+        $_SESSION['leiloes'][$carro_id] = $leilao;
+        
+        // Sincronizar o preço do leilão com o carro
+        $this->sincronizarPrecoLeilaoComCarro($carro_id);
+        
+        // Registrar timestamp do último lance do usuário
+        if (!isset($_SESSION['ultimo_lance'])) {
+            $_SESSION['ultimo_lance'] = [];
+        }
+        $_SESSION['ultimo_lance'][$usuario] = time();
+        
+        // Agendar lances automáticos futuros
+        $this->agendarLanceFuturo($carro_id);
+        
+        // Mensagem específica com base no tipo de lance
+        $msg = $e_primeiro_lance ? 
+               "Primeiro lance registrado! Valor total de R$ " . number_format($valor_a_descontar, 2, ',', '.') . " descontado." :
+               "Lance registrado! Incremento de R$ " . number_format($valor_a_descontar, 2, ',', '.') . " descontado.";
+        
+        return ['status' => 'sucesso', 'mensagem' => $msg];
+    }
     
     // Verificar se o usuário pode dar lance agora (para evitar spam)
     public function podeUsuarioDarLance($usuario) {
@@ -304,9 +335,42 @@ private function criarNovoLeilao($carro_id) {
                     
                     // Atualizar leilão
                     $_SESSION['leiloes'][$carro_id] = $leilao;
+                    
+                    // Atualizar o valor do carro no banco de dados
+                    $this->atualizarValorCarroAposLeilao($carro_id, $ultimo_lance['valor']);
                 }
             }
         }
+    }
+    
+    // Nova função para atualizar o valor do carro após o leilão
+    private function atualizarValorCarroAposLeilao($carro_id, $valor_final) {
+        // Buscar o carro
+        $carro = buscarCarro($carro_id);
+        
+        if (!$carro) {
+            return false;
+        }
+        
+        // Atualizar o preço do carro para o valor final do leilão
+        $carro['preco'] = $valor_final;
+        
+        // Verificar se é um carro do arquivo ou pré-definido
+        if ($carro_id > 1000) { // IDs acima de 1000 são carros do arquivo
+            // Editar o carro no arquivo
+            return editarCarro($carro);
+        } else {
+            // Para carros pré-definidos, atualizamos na sessão
+            global $carros;
+            foreach ($carros as $key => $c) {
+                if ($c['id'] == $carro_id) {
+                    $carros[$key]['preco'] = $valor_final;
+                    return true;
+                }
+            }
+        }
+        
+        return false;
     }
     
     // Formatar tempo restante de forma amigável
@@ -329,6 +393,46 @@ private function criarNovoLeilao($carro_id) {
         } else {
             return "$minutos minutos";
         }
+    }
+
+    // Nova função para sincronizar preços entre leilão e carro
+    public function sincronizarPrecoLeilaoComCarro($carro_id) {
+        // Obter leilão
+        if (!isset($_SESSION['leiloes']) || !isset($_SESSION['leiloes'][$carro_id])) {
+            return false;
+        }
+        
+        $leilao = $_SESSION['leiloes'][$carro_id];
+        $preco_leilao = $leilao['preco_atual'];
+        
+        // Buscar o carro
+        $carro = buscarCarro($carro_id);
+        
+        if (!$carro) {
+            return false;
+        }
+        
+        // Se o preço do leilão for diferente do preço do carro, atualize o carro
+        if ($carro['preco'] != $preco_leilao) {
+            $carro['preco'] = $preco_leilao;
+            
+            // Verificar se é um carro do arquivo ou pré-definido
+            if ($carro_id > 1000) { // IDs acima de 1000 são carros do arquivo
+                // Editar o carro no arquivo
+                return editarCarro($carro);
+            } else {
+                // Para carros pré-definidos, atualizamos na sessão
+                global $carros;
+                foreach ($carros as $key => $c) {
+                    if ($c['id'] == $carro_id) {
+                        $carros[$key]['preco'] = $preco_leilao;
+                        return true;
+                    }
+                }
+            }
+        }
+        
+        return false;
     }
 }
 

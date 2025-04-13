@@ -28,6 +28,11 @@ if (!$carro || !is_array($carro)) {
 global $leilaoManager;
 $leilao = $leilaoManager->obterLeilao($id);
 
+// Garantir que o preço do carro está sincronizado com o leilão
+$leilaoManager->sincronizarPrecoLeilaoComCarro($id);
+// Recarregar o carro para obter o preço atualizado
+$carro = buscarCarro($id);
+
 // Verificar se o usuário está logado
 $logado = usuarioLogado();
 $usuario_nome = $logado ? $_SESSION['username'] : "Não logado";
@@ -36,7 +41,13 @@ $usuario_nome = $logado ? $_SESSION['username'] : "Não logado";
 $pode_dar_lance = podeDarLance($id, $carro);
 if ($logado) {
     $usuario_obj = buscarUsuario($_SESSION['username']);
-    $saldo = $usuario_obj ? number_format($usuario_obj['saldo'], 2, ',', '.') : "N/A";
+    if ($usuario_obj) {
+        // Atualizar o saldo na sessão com o valor atual do banco de dados
+        $_SESSION['saldo'] = $usuario_obj['saldo'];
+        $saldo = number_format($usuario_obj['saldo'], 2, ',', '.');
+    } else {
+        $saldo = "N/A";
+    }
     
     // Garantir que usuario_id também esteja definido, se necessário
     if (!isset($_SESSION['usuario_id']) && isset($usuario_obj['id'])) {
@@ -63,6 +74,12 @@ if (!$carro || !is_array($carro)) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['valor']) && $usuario_logado) {
     $valor_lance = floatval(str_replace(',', '.', $_POST['valor']));
     $resultado = $leilaoManager->registrarLance($id, $usuario_logado, $valor_lance);
+    
+    // Após o lance, buscar o saldo atualizado
+    $usuario_atualizado = buscarUsuario($usuario_logado);
+    if ($usuario_atualizado) {
+        $_SESSION['saldo'] = $usuario_atualizado['saldo'];
+    }
     
     // Armazenar o resultado para exibir mensagem ao usuário
     $_SESSION['mensagem_lance'] = $resultado;
@@ -183,6 +200,28 @@ $leilao_finalizado = time() >= $leilao['data_fim'];
                             <?php if ($pode_dar_lance): ?>
                                 <!-- Interface de lances -->
                                 <div class="bid-section">
+                                    <!-- Informação de saldo e lances -->
+                                    <div class="user-balance-info" style="margin-bottom: 15px; text-align: center; background-color: rgba(46, 204, 113, 0.1); padding: 15px; border-radius: 8px; border: 1px solid rgba(46, 204, 113, 0.3);">
+                                        <span style="display: block; font-size: 14px; color: #a0aec0;">Seu saldo disponível:</span>
+                                        <span style="font-weight: bold; font-size: 18px; color: #2ecc71;">
+                                            R$ <?php echo $saldo; ?>
+                                        </span>
+                                        
+                                        <div style="margin-top: 12px; font-size: 13px; color: #a0aec0; text-align: left; padding: 10px; background: rgba(0,0,0,0.1); border-radius: 5px;">
+                                            <?php if (empty($leilao['lances'])): ?>
+                                                <strong style="color: #e74c3c;">Este será o primeiro lance!</strong><br>
+                                                <span>Para o primeiro lance, você pagará o valor total do lance.</span>
+                                            <?php else: ?>
+                                                <strong>Lance atual: R$ <?php echo number_format($leilao['preco_atual'], 2, ',', '.'); ?></strong><br>
+                                                <span>Para lances subsequentes, você paga apenas o incremento.</span>
+                                            <?php endif; ?>
+                                            <div style="margin-top: 8px;">
+                                                <strong>Próximo lance mínimo: R$ <?php echo number_format($leilao['preco_atual'] + $leilao['incremento_minimo'], 2, ',', '.'); ?></strong><br>
+                                                <strong>Incremento mínimo: R$ <?php echo number_format($leilao['incremento_minimo'], 2, ',', '.'); ?></strong>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
                                     <form action="detalhes.php?id=<?php echo $id; ?>" method="post" class="bid-form">
                                         <input type="hidden" name="carro_id" value="<?php echo $id; ?>">
                                         <input type="number" name="valor" class="bid-input" 
